@@ -1,0 +1,682 @@
+{
+  "_info": "Base de datos de Tiza Food. Edita productos, promociones, sucursales y extras aquí. Con 'node server.js' también guarda reseñas y pedidos.",
+  "products": [
+    {
+      "id": 1,
+      "name": "Hamburguesa Clásica",
+      "cat": "Hamburguesas",
+      "price": 59,
+      "emoji": "🍔",
+      "img": "img/hamburguesa.jpg",
+      "desc": "Carne de res a la parrilla, queso, lechuga, jitomate y nuestra salsa especial.",
+      "rating": 4.7
+    },
+    {
+      "id": 2,
+      "name": "Doble Queso",
+      "cat": "Hamburguesas",
+      "price": 79,
+      "emoji": "🍔",
+      "img": "img/doble-queso.jpg",
+      "desc": "Doble carne, doble queso cheddar, cebolla caramelizada y pan de mantequilla.",
+      "rating": 5
+    },
+    {
+      "id": 3,
+      "name": "Pollo Crujiente",
+      "cat": "Hamburguesas",
+      "price": 69,
+      "emoji": "🐔",
+      "img": "img/pollo.jpg",
+      "desc": "Pechuga empanizada y crujiente con mayonesa de chipotle y lechuga fresca.",
+      "rating": 5
+    },
+    {
+      "id": 11,
+      "name": "Hamburguesa BBQ",
+      "cat": "Hamburguesas",
+      "price": 75,
+      "emoji": "🍔",
+      "img": "img/bbq.jpg",
+      "desc": "Carne de res, aros de cebolla, tocino y salsa BBQ ahumada.",
+      "rating": 4.8
+    },
+    {
+      "id": 12,
+      "name": "Hamburguesa Hawaiana",
+      "cat": "Hamburguesas",
+      "price": 72,
+      "emoji": "🍍",
+      "img": "img/hawaiana-burger.jpg",
+      "desc": "Carne de res con piña asada, jamón y queso derretido.",
+      "rating": 4.4
+    },
+    {
+      "id": 4,
+      "name": "Hot Dog Jumbo",
+      "cat": "Snacks",
+      "price": 39,
+      "emoji": "🌭",
+      "img": "img/hotdog.jpg",
+      "desc": "Salchicha jumbo, tocino, cebolla, jitomate y aderezos al gusto.",
+      "rating": 3.7
+    },
+    {
+      "id": 5,
+      "name": "Papas Grandes",
+      "cat": "Snacks",
+      "price": 35,
+      "emoji": "🍟",
+      "img": "img/papas.jpg",
+      "desc": "Papas doradas y crujientes con sal. Perfectas para compartir.",
+      "rating": 4.8
+    },
+    {
+      "id": 6,
+      "name": "Nuggets (10 pzas)",
+      "cat": "Snacks",
+      "price": 55,
+      "emoji": "🍗",
+      "img": "img/nuggets.jpg",
+      "desc": "Diez nuggets de pollo con dos salsas a elegir: BBQ o mostaza miel.",
+      "rating": 5
+    },
+    {
+      "id": 7,
+      "name": "Alitas (8 pzas)",
+      "cat": "Snacks",
+      "price": 89,
+      "emoji": "🍖",
+      "img": "img/alitas.jpg",
+      "desc": "Ocho alitas bañadas en salsa BBQ o búfalo, con aderezo ranch.",
+      "rating": 4.5
+    },
+    {
+      "id": 15,
+      "name": "Aros de Cebolla",
+      "cat": "Snacks",
+      "price": 42,
+      "emoji": "🧅",
+      "img": "img/aros.jpg",
+      "desc": "Aros empanizados y dorados con aderezo ranch.",
+      "rating": 4.5
+    },
+    {
+      "id": 16,
+      "name": "Nachos con Queso",
+      "cat": "Snacks",
+      "price": 49,
+      "emoji": "🧀",
+      "img": "img/nachos.jpg",
+      "desc": "Totopos crujientes con queso cheddar derretido y jalapeños.",
+      "rating": 4.6
+    },
+    {
+      "id": 17,
+      "name": "Tacos al Pastor (5)",
+      "cat": "Snacks",
+      "price": 75,
+      "emoji": "🌮",
+      "img": "img/tacos.jpg",
+      "desc": "Cinco tacos al pastor con piña, cebolla, cilantro y salsa verde.",
+      "rating": 4.9
+    },
+    {
+      "id": 8,
+      "name": "Pizza Personal",
+      "cat": "Pizzas",
+      "price": 65,
+      "emoji": "🍕",
+      "img": "img/pizza.jpg",
+      "desc": "Pizza individual de pepperoni con mucho queso mozzarella.",
+      "rating": 4
+    },
+    {
+      "id": 13,
+      "name": "Pizza Hawaiana",
+      "cat": "Pizzas",
+      "price": 75,
+      "emoji": "🍍",
+      "img": "img/pizza-hawaiana.jpg",
+      "desc": "Jamón, piña y queso mozzarella sobre masa recién horneada.",
+      "rating": 4.3
+    },
+    {
+      "id": 14,
+      "name": "Pizza Mexicana",
+      "cat": "Pizzas",
+      "price": 80,
+      "emoji": "🌶️",
+      "img": "img/pizza-mexicana.jpg",
+      "desc": "Chorizo, jalapeño, cebolla y frijoles con queso mozzarella.",
+      "rating": 4.6
+    },
+    {
+      "id": 9,
+      "name": "Refresco Grande",
+      "cat": "Bebidas",
+      "price": 25,
+      "emoji": "🥤",
+      "img": "img/refresco.jpg",
+      "desc": "Refresco frío de 600 ml. Pregunta por el sabor del día.",
+      "rating": 3.7
+    },
+    {
+      "id": 10,
+      "name": "Malteada de Fresa",
+      "cat": "Bebidas",
+      "price": 45,
+      "emoji": "🍓",
+      "img": "img/malteada.jpg",
+      "desc": "Malteada cremosa de fresa con crema batida.",
+      "rating": 4.6
+    },
+    {
+      "id": 18,
+      "name": "Malteada de Chocolate",
+      "cat": "Bebidas",
+      "price": 45,
+      "emoji": "🍫",
+      "img": "img/malteada-chocolate.jpg",
+      "desc": "Malteada espesa de chocolate con crema batida.",
+      "rating": 4.7
+    },
+    {
+      "id": 19,
+      "name": "Limonada Mineral",
+      "cat": "Bebidas",
+      "price": 30,
+      "emoji": "🍋",
+      "img": "img/limonada.jpg",
+      "desc": "Limonada natural con agua mineral y mucho hielo.",
+      "rating": 4.4
+    },
+    {
+      "id": 20,
+      "name": "Agua de Horchata",
+      "cat": "Bebidas",
+      "price": 28,
+      "emoji": "🥛",
+      "img": "img/horchata.jpg",
+      "desc": "Horchata fresca de arroz con canela. 600 ml.",
+      "rating": 4.5
+    },
+    {
+      "id": 21,
+      "name": "Helado de Vainilla",
+      "cat": "Postres",
+      "price": 35,
+      "emoji": "🍦",
+      "img": "img/helado.jpg",
+      "more": true,
+      "desc": "Tres bolas de helado cremoso de vainilla con galleta.",
+      "rating": 4.6
+    },
+    {
+      "id": 22,
+      "name": "Brownie con Helado",
+      "cat": "Postres",
+      "price": 55,
+      "emoji": "🍫",
+      "img": "img/brownie.jpg",
+      "more": true,
+      "only": [
+        0,
+        1,
+        2
+      ],
+      "desc": "Brownie tibio de chocolate con bola de helado y salsa de chocolate.",
+      "rating": 4.9
+    },
+    {
+      "id": 23,
+      "name": "Pastel de Chocolate",
+      "cat": "Postres",
+      "price": 49,
+      "emoji": "🍰",
+      "img": "img/pastel.jpg",
+      "more": true,
+      "only": [
+        0,
+        1
+      ],
+      "desc": "Rebanada de pastel de chocolate húmedo con betún cremoso.",
+      "rating": 4.7
+    },
+    {
+      "id": 24,
+      "name": "Churros (6 pzas)",
+      "cat": "Postres",
+      "price": 45,
+      "emoji": "🍩",
+      "img": "img/churros.jpg",
+      "more": true,
+      "desc": "Seis churros crujientes con azúcar y canela, con cajeta o chocolate para mojar.",
+      "rating": 4.8
+    },
+    {
+      "id": 25,
+      "name": "Waffle con Fresas",
+      "cat": "Postres",
+      "price": 59,
+      "emoji": "🧇",
+      "img": "img/waffle.jpg",
+      "more": true,
+      "only": [
+        0,
+        2
+      ],
+      "desc": "Waffle dorado con fresas, crema batida y miel.",
+      "rating": 4.5
+    },
+    {
+      "id": 26,
+      "name": "Flan Napolitano",
+      "cat": "Postres",
+      "price": 38,
+      "emoji": "🍮",
+      "img": "img/flan.jpg",
+      "more": true,
+      "desc": "Flan casero con caramelo, suave y cremoso.",
+      "rating": 4.4
+    },
+    {
+      "id": 27,
+      "name": "Galletas (3 pzas)",
+      "cat": "Postres",
+      "price": 30,
+      "emoji": "🍪",
+      "img": "img/galletas.jpg",
+      "more": true,
+      "desc": "Tres galletas grandes con chispas de chocolate, recién horneadas.",
+      "rating": 4.3
+    },
+    {
+      "id": 28,
+      "name": "Café Frío",
+      "cat": "Bebidas",
+      "price": 42,
+      "emoji": "☕",
+      "img": "img/cafe-frio.jpg",
+      "more": true,
+      "only": [
+        0,
+        1,
+        2
+      ],
+      "desc": "Café frío cremoso con hielo, leche y jarabe de vainilla.",
+      "rating": 4.6
+    },
+    {
+      "id": 29,
+      "name": "Té Helado de Durazno",
+      "cat": "Bebidas",
+      "price": 28,
+      "emoji": "🍑",
+      "img": "img/te.jpg",
+      "more": true,
+      "desc": "Té negro frío con sabor a durazno. 600 ml.",
+      "rating": 4.2
+    },
+    {
+      "id": 30,
+      "name": "Jugo de Naranja",
+      "cat": "Bebidas",
+      "price": 32,
+      "emoji": "🍊",
+      "img": "img/jugo.jpg",
+      "more": true,
+      "desc": "Jugo de naranja natural recién exprimido. 500 ml.",
+      "rating": 4.7
+    },
+    {
+      "id": 31,
+      "name": "Agua Natural",
+      "cat": "Bebidas",
+      "price": 15,
+      "emoji": "💧",
+      "img": "img/agua.jpg",
+      "more": true,
+      "desc": "Botella de agua natural de 600 ml.",
+      "rating": 4
+    },
+    {
+      "id": 32,
+      "name": "Frappé de Oreo",
+      "cat": "Bebidas",
+      "price": 52,
+      "emoji": "🥤",
+      "img": "img/frappe.jpg",
+      "more": true,
+      "only": [
+        0,
+        1
+      ],
+      "desc": "Frappé helado de galleta Oreo con crema batida.",
+      "rating": 4.8
+    },
+    {
+      "id": 33,
+      "name": "Hamburguesa Vegetariana",
+      "cat": "Hamburguesas",
+      "price": 69,
+      "emoji": "🥗",
+      "img": "img/veggie.jpg",
+      "more": true,
+      "desc": "Medallón de lentejas y avena con aguacate, jitomate y lechuga.",
+      "rating": 4.4
+    },
+    {
+      "id": 34,
+      "name": "Mini Burgers (3 pzas)",
+      "cat": "Hamburguesas",
+      "price": 65,
+      "emoji": "🍔",
+      "img": "img/mini-burgers.jpg",
+      "more": true,
+      "desc": "Tres mini hamburguesas con queso, ideales para compartir.",
+      "rating": 4.6
+    },
+    {
+      "id": 35,
+      "name": "Esquites",
+      "cat": "Snacks",
+      "price": 35,
+      "emoji": "🌽",
+      "img": "img/esquites.jpg",
+      "more": true,
+      "desc": "Elote en vaso con mayonesa, queso, chile y limón.",
+      "rating": 4.5
+    },
+    {
+      "id": 36,
+      "name": "Dedos de Queso (6)",
+      "cat": "Snacks",
+      "price": 45,
+      "emoji": "🧀",
+      "img": "img/dedos-queso.jpg",
+      "more": true,
+      "desc": "Seis dedos de queso mozzarella empanizados con salsa marinara.",
+      "rating": 4.6
+    },
+    {
+      "id": 37,
+      "name": "Pizza 4 Quesos",
+      "cat": "Pizzas",
+      "price": 85,
+      "emoji": "🧀",
+      "img": "img/pizza-4quesos.jpg",
+      "more": true,
+      "desc": "Mozzarella, cheddar, parmesano y queso crema sobre masa artesanal.",
+      "rating": 4.7
+    },
+    {
+      "id": 38,
+      "name": "Pizza Familiar",
+      "cat": "Pizzas",
+      "price": 150,
+      "emoji": "🍕",
+      "img": "img/pizza-familiar.jpg",
+      "more": true,
+      "only": [
+        0,
+        2,
+        3
+      ],
+      "desc": "Pizza grande de 8 rebanadas, elige tu especialidad.",
+      "rating": 4.8
+    }
+  ],
+  "promos": [
+    {
+      "name": "Hamburguesa Especial",
+      "cat": "Hamburguesas",
+      "price": 85,
+      "img": "img/hamburguesa.jpg",
+      "emoji": "🍔",
+      "tag": "bestseller",
+      "tagText": "MÁS VENDIDO",
+      "short": "Carne de res + Queso + Tocino",
+      "desc": "Jugosa carne de res a la parrilla con queso fundido, lechuga fresca y jitomate."
+    },
+    {
+      "name": "Pizza Peperoni",
+      "cat": "Pizzas",
+      "price": 120,
+      "img": "img/pizza.jpg",
+      "emoji": "🍕",
+      "tag": "popular",
+      "tagText": "POPULAR",
+      "short": "Queso Mozzarella + Peperoni",
+      "desc": "Masa crujiente horneada al momento con abundante queso mozzarella y peperoni."
+    },
+    {
+      "name": "Papas Preparadas",
+      "cat": "Snacks",
+      "price": 45,
+      "img": "img/papas.jpg",
+      "emoji": "🍟",
+      "tag": "save",
+      "tagText": "Ahorra 15%",
+      "short": "Crujientes con Especias",
+      "desc": "Papas a la francesa doraditas y sazonadas con especias de la casa."
+    },
+    {
+      "name": "Combo Pareja",
+      "cat": "Combos",
+      "price": 159,
+      "img": "img/combo-pareja.jpg",
+      "emoji": "💑",
+      "tag": "save",
+      "tagText": "Ahorra $30",
+      "short": "2 hamburguesas + papas + 2 refrescos",
+      "desc": "Dos hamburguesas clásicas, papas grandes para compartir y dos refrescos fríos."
+    },
+    {
+      "name": "Combo Familiar",
+      "cat": "Combos",
+      "price": 239,
+      "img": "img/combo-familiar.jpg",
+      "emoji": "👨‍👩‍👧‍👦",
+      "tag": "popular",
+      "tagText": "FAMILIAR",
+      "short": "Pizza + 8 alitas + refresco 2 L",
+      "desc": "Pizza grande de pepperoni, ocho alitas BBQ o búfalo y refresco de 2 litros."
+    },
+    {
+      "name": "Combo Kids",
+      "cat": "Combos",
+      "price": 69,
+      "img": "img/combo-kids.jpg",
+      "emoji": "🧸",
+      "tag": "bestseller",
+      "tagText": "KIDS",
+      "short": "6 nuggets + papas + jugo",
+      "desc": "Seis nuggets de pollo, papas chicas y jugo. Incluye sorpresa."
+    },
+    {
+      "name": "2x1 en Hot Dogs",
+      "cat": "Snacks",
+      "price": 59,
+      "img": "img/hotdog.jpg",
+      "emoji": "🌭",
+      "tag": "save",
+      "tagText": "2x1",
+      "short": "Dos hot dogs jumbo",
+      "desc": "Dos hot dogs jumbo con tocino, cebolla, jitomate y aderezos al gusto."
+    },
+    {
+      "name": "Martes de Alitas",
+      "cat": "Snacks",
+      "price": 75,
+      "img": "img/alitas.jpg",
+      "emoji": "🍖",
+      "tag": "popular",
+      "tagText": "-15%",
+      "short": "8 alitas BBQ o búfalo",
+      "desc": "Ocho alitas bañadas en la salsa que elijas, con aderezo ranch."
+    },
+    {
+      "name": "Combo Taquero",
+      "cat": "Combos",
+      "price": 99,
+      "img": "img/tacos.jpg",
+      "emoji": "🌮",
+      "tag": "bestseller",
+      "tagText": "NUEVO",
+      "short": "5 tacos al pastor + 2 refrescos",
+      "desc": "Cinco tacos al pastor con piña y salsa verde, más dos refrescos."
+    },
+    {
+      "name": "Malteada Doble",
+      "cat": "Bebidas",
+      "price": 69,
+      "img": "img/malteada.jpg",
+      "emoji": "🍓",
+      "tag": "save",
+      "tagText": "Ahorra 25%",
+      "short": "2 malteadas a elegir",
+      "desc": "Dos malteadas cremosas con crema batida. Elige fresa o chocolate."
+    }
+  ],
+  "branches": [
+    {
+      "name": "Sucursal Centro",
+      "zone": "Centro, Tizayuca",
+      "km": 0.8
+    },
+    {
+      "name": "Sucursal Haciendas",
+      "zone": "Haciendas de Tizayuca",
+      "km": 2.4
+    },
+    {
+      "name": "Sucursal Tizayuca Sur",
+      "zone": "Carretera México-Pachuca",
+      "km": 3.9
+    },
+    {
+      "name": "Sucursal Ex Hacienda",
+      "zone": "Fracc. Ex Hacienda, Tizayuca",
+      "km": 5.5
+    }
+  ],
+  "extras": {
+    "Hamburguesas": [
+      {
+        "name": "Extra queso",
+        "price": 15
+      },
+      {
+        "name": "Carne extra",
+        "price": 25
+      },
+      {
+        "name": "Tocino crujiente",
+        "price": 20
+      },
+      {
+        "name": "Aguacate",
+        "price": 15
+      },
+      {
+        "name": "Jalapeños",
+        "price": 8
+      }
+    ],
+    "Snacks": [
+      {
+        "name": "Queso cheddar",
+        "price": 12
+      },
+      {
+        "name": "Salsa extra",
+        "price": 5
+      },
+      {
+        "name": "Tocino",
+        "price": 15
+      },
+      {
+        "name": "Aderezo ranch",
+        "price": 8
+      }
+    ],
+    "Pizzas": [
+      {
+        "name": "Extra queso",
+        "price": 20
+      },
+      {
+        "name": "Peperoni extra",
+        "price": 20
+      },
+      {
+        "name": "Champiñones",
+        "price": 15
+      },
+      {
+        "name": "Orilla rellena",
+        "price": 25
+      }
+    ],
+    "Bebidas": [
+      {
+        "name": "Crema batida",
+        "price": 10
+      },
+      {
+        "name": "Shot de chocolate",
+        "price": 12
+      },
+      {
+        "name": "Tamaño grande",
+        "price": 10
+      }
+    ],
+    "Postres": [
+      {
+        "name": "Bola de helado",
+        "price": 15
+      },
+      {
+        "name": "Cajeta",
+        "price": 8
+      },
+      {
+        "name": "Crema batida",
+        "price": 10
+      },
+      {
+        "name": "Chispas de chocolate",
+        "price": 8
+      }
+    ],
+    "Combos": [
+      {
+        "name": "Extra queso",
+        "price": 15
+      },
+      {
+        "name": "Papas grandes",
+        "price": 15
+      },
+      {
+        "name": "Salsa extra",
+        "price": 5
+      },
+      {
+        "name": "Cambiar a malteada",
+        "price": 20
+      }
+    ]
+  },
+  "reviews": [],
+  "transfer": {
+    "bank": "BBVA",
+    "holder": "Tizafood",
+    "clabe": "1245879065234590",
+    "demo": true
+  },
+  "orders": []
+}

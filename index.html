@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#d62828">
+  <title>Tiza Food | Comida rápida en Tizayuca</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23d62828'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='38' fill='white'%3ETF%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="styles.css?v=20261020-firebase-all-1">
+</head>
+<body>
+
+  <!-- ========== PANTALLA DE INICIO (LOGO ANIMADO) ========== -->
+  <div id="splash" class="splash">
+    <div class="splash-inner">
+      <svg class="logo-svg" viewBox="0 0 240 190" aria-hidden="true">
+        <ellipse class="logo-ring" cx="120" cy="120" rx="108" ry="44" transform="rotate(-18 120 120)" />
+        <g class="fries">
+          <g transform="rotate(-14 70 100)"><rect class="fry" x="64" y="58" width="15" height="72" rx="3"/></g>
+          <g transform="rotate(-8 86 100)"><rect class="fry" x="78" y="40" width="16" height="90" rx="3"/></g>
+          <g transform="rotate(-3 104 100)"><rect class="fry" x="97" y="28" width="16" height="100" rx="3"/></g>
+          <g transform="rotate(2 122 100)"><rect class="fry" x="115" y="20" width="16" height="108" rx="3"/></g>
+          <g transform="rotate(7 140 100)"><rect class="fry" x="133" y="34" width="16" height="96" rx="3"/></g>
+          <g transform="rotate(12 158 100)"><rect class="fry" x="151" y="48" width="16" height="82" rx="3"/></g>
+        </g>
+        <path class="bowl" d="M34 118 H206 C206 158 172 176 120 176 C68 176 34 158 34 118 Z" />
+        <path class="rim" d="M30 118 H210" />
+        <text class="bowl-text" x="120" y="156" text-anchor="middle">TF</text>
+        <circle class="ball" cx="221" cy="103" r="10" />
+        <path class="ball-line" d="M214 100 Q221 96 228 100" />
+      </svg>
+
+      <h1 class="logo-text" aria-label="Tiza Food">
+        <span>T</span><span>i</span><span>z</span><span>a</span><span class="sp"></span><span class="ya">F</span><span class="ya">o</span><span class="ya">o</span><span class="ya">d</span>
+      </h1>
+      <svg class="swoosh" viewBox="0 0 260 20" aria-hidden="true"><path d="M6 14 C70 2, 150 2, 254 8" /></svg>
+      <p class="splash-sub">Comida rápida en Tizayuca</p>
+    </div>
+
+    <svg class="truck" viewBox="0 0 170 90" aria-hidden="true">
+      <rect x="6" y="14" width="100" height="46" rx="6" fill="#ffffff"/>
+      <text x="56" y="43" text-anchor="middle" font-family="Trebuchet MS, Segoe UI, sans-serif" font-weight="800" font-size="15" fill="#d62828">Tiza Food</text>
+      <path d="M106 28 H138 L160 46 V60 H106 Z" fill="#ffb703"/>
+      <path d="M114 33 H134 L147 46 H114 Z" fill="#cfe8ff"/>
+      <circle cx="124" cy="42" r="6" fill="#d62828"/>
+      <circle cx="126" cy="41" r="1.6" fill="#ffffff"/>
+      <path d="M129 42 L136 44 L129 46 Z" fill="#ff8c00"/>
+      <rect x="6" y="58" width="154" height="6" rx="3" fill="#3b2314"/>
+      <g class="wheel-wrap"><circle cx="34" cy="66" r="13" fill="#3b2314"/><g class="wheel"><circle cx="34" cy="66" r="6" fill="#d9d9d9"/><path d="M34 60 V72 M28 66 H40" stroke="#3b2314" stroke-width="2"/></g></g>
+      <g class="wheel-wrap"><circle cx="132" cy="66" r="13" fill="#3b2314"/><g class="wheel"><circle cx="132" cy="66" r="6" fill="#d9d9d9"/><path d="M132 60 V72 M126 66 H138" stroke="#3b2314" stroke-width="2"/></g></g>
+    </svg>
+  </div>
+
+  <!-- ========== BIENVENIDA ========== -->
+  <section id="welcome" class="welcome hidden">
+    <div class="blob blob-a"></div>
+    <div class="blob blob-b"></div>
+    <div class="welcome-card">
+      <svg class="welcome-logo" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#d62828"/><ellipse cx="50" cy="50" rx="38" ry="22" transform="rotate(-30 50 50)" fill="none" stroke="#ffb703" stroke-width="5"/><text x="50" y="59" text-anchor="middle" font-family="Trebuchet MS, Segoe UI, sans-serif" font-weight="800" font-size="27" fill="#ffffff">TF</text><circle cx="20" cy="68" r="6" fill="#ffb703" stroke="#3b2314" stroke-width="2"/></svg>
+      <p class="welcome-kicker">TIZA FOOD</p>
+      <h2 id="welcomeTitle">¡Gracias por elegir nuestra app!</h2>
+      <p id="welcomeText" class="welcome-text">Tu comida favorita, personalizada a tu gusto y en camino en minutos. Pide fácil desde cualquier colonia de Tizayuca.</p>
+      <ul class="welcome-points">
+        <li><span></span> Entrega rapida a tu puerta</li>
+        <li><span></span> Personaliza tu propio pedido con lo que quieras</li>
+        <li><span></span> Sigue tu pedido en tiempo real </li>
+      </ul>
+      <button id="btnWelcome" class="btn btn-main">Comenzar</button>
+      <div class="staff-entry"><h3>Acceso del personal</h3><p class="muted">Entra al panel del restaurante</p><div class="staff-entry-options"><button type="button" class="btn btn-ghost" data-staff-login="dueno">Dueño</button><button type="button" class="btn btn-ghost" data-staff-login="empleado">Empleado</button></div></div>
+    </div>
+  </section>
+
+  <!-- ========== REGISTRO ========== -->
+  <section id="register" class="register hidden">
+    <div class="register-card">
+      <div class="mini-logo"><svg class="mini-icon" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#d62828"/><ellipse cx="50" cy="50" rx="38" ry="22" transform="rotate(-30 50 50)" fill="none" stroke="#ffb703" stroke-width="5"/><text x="50" y="59" text-anchor="middle" font-family="Trebuchet MS, Segoe UI, sans-serif" font-weight="800" font-size="27" fill="#ffffff">TF</text><circle cx="20" cy="68" r="6" fill="#ffb703" stroke="#3b2314" stroke-width="2"/></svg> Tiza Food</div>
+      <h2>Crea tu cuenta</h2>
+      <p class="muted">Solo te toma un momento. Con estos datos te llevamos tu pedido.</p>
+
+      <form id="registerForm" novalidate>
+        <p id="authConnectionNotice" class="muted hidden">Para entrar a tu cuenta o administrar el restaurante, abre INICIAR-TIZA-FOOD.cmd y entra en <a href="http://localhost:3000">http://localhost:3000</a>.</p>
+        <p class="muted">Accede con Firebase usando tu correo y contraseña. Necesitas internet.</p><div id="registrationDetails"><label for="rName">Nombre</label>
+        <input id="rName" type="text" placeholder="Tu nombre completo" autocomplete="name">
+
+        </div><label for="rUsername">Usuario</label><input id="rUsername" type="text" autocomplete="username" placeholder="Tu usuario">
+        <div id="registrationContact"><label for="rEmail">Correo</label>
+        <input id="rEmail" type="email" placeholder="correo@ejemplo.com" autocomplete="email">
+
+        <fieldset class="address-grid"><legend>Dirección de entrega</legend>
+<div><label for="rStreet">Calle</label><input id="rStreet" type="text" maxlength="100"></div>
+<div><label for="rHouseNumber">Número de casa</label><input id="rHouseNumber" type="text" maxlength="100"></div>
+<div><label for="rNeighborhood">Colonia</label><input id="rNeighborhood" type="text" maxlength="100"></div>
+<div><label for="rMunicipality">Municipio</label><input id="rMunicipality" type="text" maxlength="100"></div>
+<div><label for="rState">Estado</label><input id="rState" type="text" maxlength="100"></div>
+<div><label for="rPostalCode">Código postal</label><input id="rPostalCode" type="text" maxlength="5" inputmode="numeric" pattern="[0-9]{5}"></div>
+</fieldset></div>
+        <label for="rPassword">Contraseña</label><div class="password-control"><input id="rPassword" type="password" autocomplete="current-password" placeholder="Mínimo 8 caracteres"><button type="button" class="password-toggle" data-password-toggle="rPassword" aria-label="Mostrar contraseña" aria-controls="rPassword" aria-pressed="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button></div><div id="confirmPasswordField" class="hidden"><label for="rPasswordConfirm">Confirmar contraseña</label><div class="password-control"><input id="rPasswordConfirm" type="password" autocomplete="new-password" placeholder="Escribe nuevamente tu contraseña" disabled><button type="button" class="password-toggle" data-password-toggle="rPasswordConfirm" aria-label="Mostrar confirmación de contraseña" aria-controls="rPasswordConfirm" aria-pressed="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button></div></div><button type="button" id="btnAuthMode" class="link-btn">Ya tengo cuenta: iniciar sesión</button>
+        <p id="registerError" class="error" role="alert"></p>
+        <button type="submit" class="btn btn-main">Entrar a la app</button>
+        <button type="button" id="btnMigrateAccount" class="link-btn">Pasar mi cuenta anterior a Firebase</button><button type="button" id="btnOwnerSetup" class="link-btn hidden">Configurar cuenta del dueño</button>
+        <div class="staff-entry staff-entry-form"><span>Acceso del personal</span><div class="staff-entry-options"><button type="button" class="link-btn" data-staff-login="dueno">Dueño</button><button type="button" class="link-btn" data-staff-login="empleado">Empleado</button></div></div>
+        <button type="button" id="btnRegBack" class="link-btn">← Volver</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="staffPanel" class="hidden staff-panel">
+    <header class="staff-header"><div><h1 id="staffTitle">Administración</h1><p id="staffUser"></p></div><button id="staffLogout" type="button" class="btn btn-ghost">Cerrar sesión</button></header>
+    <p id="staffMessage" role="status"></p>
+    <nav class="staff-tabs" aria-label="Administración"><button class="btn btn-ghost" data-staff-tab="orders">Pedidos</button><button class="btn btn-ghost owner-only" data-staff-tab="products">Productos</button><button class="btn btn-ghost owner-only" data-staff-tab="employees">Empleados</button><button class="btn btn-ghost owner-only" data-staff-tab="sales">Ventas</button></nav>
+    <section id="staffOrders"><h2>Pedidos del restaurante</h2><button id="refreshOrders" class="link-btn">Actualizar pedidos</button><div id="staffOrderList"></div></section>
+    <section id="staffProducts" class="hidden owner-only"><h2>Administrar productos</h2><form id="productForm" class="staff-form"><input id="productId" type="hidden">
+      <label>Nombre<input id="productName" required maxlength="100"></label><label>Categoría<input id="productCat" list="productCategories" required maxlength="60"></label><datalist id="productCategories"><option>Hamburguesas</option><option>Snacks</option><option>Pizzas</option><option>Bebidas</option><option>Postres</option><option>Combos</option></datalist>
+      <label>Precio<input id="productPrice" type="number" min="0.01" max="100000" step="0.01" required></label><div class="product-image-picker"><label for="productImageFile">Imagen del producto</label><input id="productImg" type="hidden"><input id="productImageFile" type="file" accept="image/jpeg,image/png,image/webp" hidden><button id="chooseProductImage" class="btn btn-ghost" type="button">Elegir imagen de mis archivos</button><p id="productImageName" class="muted">Sin imagen seleccionada</p><img id="productImagePreview" class="product-image-preview hidden" alt="Vista previa de la imagen del producto"><button id="removeProductImage" class="link-btn hidden" type="button">Quitar imagen</button><p id="productImageError" class="error" role="alert"></p></div><label>Descripción<textarea id="productDesc" maxlength="600"></textarea></label>
+      <button class="btn btn-main" type="submit">Guardar producto</button><button id="cancelProduct" class="btn btn-ghost" type="button">Nuevo / cancelar edición</button>
+    </form><div id="staffProductList"></div></section>
+    <section id="staffSales" class="hidden owner-only"><h2>Resumen de ventas</h2><label for="salesPeriod">Periodo</label><select id="salesPeriod"><option value="today">Hoy</option><option value="all">Todo el historial</option></select><button id="refreshSales" class="link-btn" type="button">Actualizar resumen</button><p class="muted">Ventas entregadas: total de pedidos entregados, incluido el envío. Excluye cancelaciones y no equivale a pagos bancarios verificados. Día calculado con horario de Ciudad de México.</p><div id="salesSummary" class="sales-grid"></div><div id="salesMethods"></div></section>
+    <section id="staffEmployees" class="hidden owner-only"><h2>Cuentas de empleados</h2><form id="employeeForm" class="staff-form"><label>Nombre<input id="employeeName" required></label><label>Correo de Firebase<input id="employeeUsername" type="email" required autocomplete="off"></label><div><label for="employeePassword">Contraseña</label><div class="password-control"><input id="employeePassword" type="password" minlength="8" required autocomplete="new-password"><button type="button" class="password-toggle" data-password-toggle="employeePassword" aria-label="Mostrar contraseña" aria-controls="employeePassword" aria-pressed="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button></div></div><div><label for="employeePasswordConfirm">Confirmar contraseña</label><div class="password-control"><input id="employeePasswordConfirm" type="password" minlength="8" required autocomplete="new-password"><button type="button" class="password-toggle" data-password-toggle="employeePasswordConfirm" aria-label="Mostrar confirmación de contraseña" aria-controls="employeePasswordConfirm" aria-pressed="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m3 3 18 18"/></svg></button></div></div><button class="btn btn-main" type="submit">Crear empleado</button></form><div id="staffEmployeeList"></div></section>
+  </section>
+  <!-- ========== APP ========== -->
+  <div id="app" class="app hidden">
+
+    <header class="topbar">
+      <div class="brand">
+        <svg class="brand-logo" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#d62828"/><ellipse cx="50" cy="50" rx="38" ry="22" transform="rotate(-30 50 50)" fill="none" stroke="#ffb703" stroke-width="5"/><text x="50" y="59" text-anchor="middle" font-family="Trebuchet MS, Segoe UI, sans-serif" font-weight="800" font-size="27" fill="#ffffff">TF</text><circle cx="20" cy="68" r="6" fill="#ffb703" stroke="#3b2314" stroke-width="2"/></svg>
+        <span class="brand-name">Tiza Food</span>
+      </div>
+      <div class="top-actions">
+        <button id="btnSound" class="icon-btn" type="button" aria-label="Activar o silenciar sonido">🔊</button>
+        <button id="btnUser" class="user-chip" aria-label="Abrir mi cuenta">
+          <span class="user-text">Hola, <strong id="helloName"></strong></span>
+          <span id="topAvatar" class="avatar avatar-sm"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ===== VISTA: INICIO ===== -->
+    <main id="view-home" class="view active">
+      <section class="hero-section">
+        <span class="hero-float f1" aria-hidden="true">🍔</span>
+        <span class="hero-float f2" aria-hidden="true">🍟</span>
+        <span class="hero-float f3" aria-hidden="true">🍕</span>
+        <div class="hero-content">
+          <div class="hero-text">
+            <p class="hero-kicker"><span class="dot"></span> Abierto ahora · Tizayuca</p>
+            <h1 class="main-title" aria-label="Tiza Food">
+              <span class="word word-a"><span style="--i:0">T</span><span style="--i:1">i</span><span style="--i:2">z</span><span style="--i:3">a</span></span>
+              <span class="word word-b"><span style="--i:4">F</span><span style="--i:5">o</span><span style="--i:6">o</span><span style="--i:7">d</span></span>
+            </h1>
+            <svg class="title-swoosh" viewBox="0 0 260 16" aria-hidden="true"><path d="M4 11 C60 1, 150 1, 256 8" /></svg>
+            <p class="slogan">Cero hambre, entrega rápida</p>
+
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input id="heroSearch" type="search" placeholder="Busca comida o sucursal..." readonly>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <img src="img/hamburguesa.jpg" alt="Tiza Food" class="animated-food-logo"
+                 onload="this.style.display='';this.nextElementSibling.style.display='none'"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+            <div class="hero-emoji" style="display:none" aria-hidden="true">🍔</div>
+          </div>
+        </div>
+      </section>
+
+      <button id="btnClientPanel" type="button" class="btn btn-ghost wide client-panel-link">Mi panel · Datos y pedidos</button>
+      <button id="homeBranch" class="branch-chip" type="button">📍 <span id="homeBranchName"></span> · <u>cambiar</u></button>
+
+      <!-- PROMOCIONES -->
+      <section class="promos-section">
+        <div class="section-header">
+          <h2>Promociones populares 🔥</h2>
+          <a href="#menuSection" class="view-all">Ver menú →</a>
+        </div>
+        <div class="promo-marquee" id="promoMarquee" aria-label="Promociones populares">
+          <div class="promo-track" id="promoTrack"></div>
+        </div>
+
+        <div class="offer-banner">
+          <div class="offer-info">
+            <span class="offer-badge">OFERTA EXCLUSIVA</span>
+            <h3>HASTA 25% DE DESCUENTO</h3>
+            <p>En combos seleccionados de Tiza Food</p>
+            <a href="#menuSection" class="order-now-btn">Pedir ahora →</a>
+          </div>
+          <div class="offer-emoji" aria-hidden="true">🍔</div>
+        </div>
+      </section>
+
+      <!-- MENÚ -->
+      <section id="menuSection" class="menu-section">
+        <div class="section-head menu-head">
+          <h3 id="menuHeading">Menú</h3>
+          <small id="menuCount" class="muted"></small>
+        </div>
+        <div id="cats" class="cats"></div>
+        <p id="catHint" class="hint hidden"></p>
+        <div id="menu" class="menu"></div>
+        <p id="noProducts" class="empty hidden">No hay productos con ese nombre. Prueba con otra palabra o cambia el filtro.</p>
+      </section>
+
+      <!-- RESEÑAS -->
+      <section id="reviewsSection" class="reviews-section">
+        <div class="rv-head">
+          <h2>Opiniones de clientes ⭐</h2>
+          <button id="btnWriteReview" class="btn btn-main">✍️ Escribir reseña</button>
+        </div>
+        <div id="rvSummary" class="rv-summary"></div>
+        <div class="rv-tools">
+          <select id="reviewFilter" class="catalog-select" aria-label="Filtrar reseñas por producto"></select>
+        </div>
+        <div id="rvList" class="rv-list"></div>
+      </section>
+    </main>
+
+    <!-- ===== VISTA: BUSCAR ===== -->
+    <main id="view-search" class="view">
+      <div class="view-title"><h2>Buscar</h2></div>
+      <div class="search-box search-big">
+        <span class="search-icon">🔍</span>
+        <input id="searchInput" type="search" placeholder="Busca comida o sucursal..." autocomplete="off">
+      </div>
+      <h3 id="searchLabel" class="sub-title">Populares</h3>
+      <div id="searchResults" class="menu"></div>
+      <div id="searchBranches" class="branches"></div>
+      <p id="searchEmpty" class="empty hidden">No encontramos nada con ese nombre. Prueba con otra palabra.</p>
+    </main>
+
+    <!-- ===== VISTA: CARRITO ===== -->
+    <main id="view-cart" class="view">
+      <div class="view-title"><h2>Mi carrito</h2></div>
+      <div id="cartList" class="cart-list"></div>
+      <div id="cartSummary" class="summary hidden"></div>
+      <button id="btnCartCheckout" class="btn btn-main wide hidden">Continuar con el pedido</button>
+    </main>
+
+    <!-- ===== VISTA: FAVORITOS ===== -->
+    <main id="view-favs" class="view">
+      <div class="view-title"><h2>Favoritos</h2></div>
+      <div id="favList" class="menu"></div>
+      <div id="favEmpty" class="empty hidden">Aún no tienes favoritos. Toca el ♡ en cualquier producto para guardarlo aquí.</div>
+    </main>
+
+    <!-- ===== VISTA: LUGARES ===== -->
+    <main id="view-places" class="view">
+      <div class="view-title"><h2>Sucursales en Tizayuca</h2></div>
+      <div class="map-box"><iframe id="plMap" title="Mapa de la sucursal" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      <div class="info-grid">
+        <div><span>Sucursal</span><strong id="plName"></strong></div>
+        <div><span>Tiempo</span><strong id="plEta"></strong></div>
+        <div><span>Envío</span><strong id="plFee"></strong></div>
+      </div>
+      <div id="branches" class="branches"></div>
+      <a id="plLink" class="btn btn-ghost wide" target="_blank" rel="noopener">Abrir en Google Maps</a>
+    </main>
+
+    <!-- ===== BARRA INFERIOR ===== -->
+    <nav class="bottom-nav" aria-label="Navegación principal">
+      <button class="nav-btn active" data-view="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>Inicio</span></button>
+      <button class="nav-btn" data-view="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span>Buscar</span></button>
+      <button class="nav-btn" data-view="cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 7H6"/></svg><span>Carrito</span><i id="cartBadge" class="nav-badge hidden">0</i></button>
+      <button class="nav-btn" data-view="favs"><svg viewBox="0 0 24 24"><path d="M20.8 5.6a5.2 5.2 0 0 0-7.4 0L12 7l-1.4-1.4a5.2 5.2 0 0 0-7.4 7.4L12 21.8l8.8-8.8a5.2 5.2 0 0 0 0-7.4z"/></svg><span>Favoritos</span></button>
+      <button class="nav-btn" data-view="places"><svg viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Lugares</span></button>
+    </nav>
+  </div>
+
+  <!-- ========== PANTALLA: MI CUENTA ========== -->
+  <section id="accountScreen" class="screen" aria-hidden="true">
+    <header class="screen-head">
+      <button class="back" data-back aria-label="Volver">‹</button>
+      <h2>Mi panel de cliente</h2>
+    </header>
+    <div class="screen-body">
+      <div class="profile-top">
+        <div class="avatar-wrap">
+          <span id="bigAvatar" class="avatar avatar-lg"></span>
+          <button id="btnPhoto" class="photo-btn" type="button" aria-label="Cambiar foto">📷</button>
+          <input id="photoInput" type="file" accept="image/*" hidden>
+        </div>
+        <div>
+          <strong id="uNameTop" class="profile-name"></strong>
+          <small id="uStats" class="muted"></small>
+        </div>
+      </div>
+
+      <h3 class="sub-title">Mis datos</h3>
+      <form id="profileForm" class="profile-form" novalidate>
+        <label for="uName">Nombre</label>
+        <input id="uName" type="text" autocomplete="name">
+        <label for="uEmail">Correo</label>
+        <input id="uEmail" type="email" autocomplete="email">
+        <label for="uAddress">Dirección de entrega</label>
+        <input id="uAddress" type="text" autocomplete="street-address">
+        <p id="profileMsg" class="error" role="alert"></p>
+        <button type="submit" class="btn btn-main wide">Guardar cambios</button>
+      </form>
+
+      <h3 class="sub-title">Mis lugares de entrega</h3>
+      <div id="placesList" class="orders"></div>
+
+      <h3 class="sub-title">Mis pedidos</h3>
+      <div id="ordersList" class="orders"></div>
+
+      
+      <button id="btnLogout" class="btn btn-ghost wide">Cerrar sesión</button>
+    </div>
+  </section>
+
+  <!-- ========== PANTALLA: CONFIRMAR ENTREGA (MAPA) ========== -->
+  <section id="checkoutScreen" class="screen" aria-hidden="true">
+    <header class="screen-head">
+      <button class="back" data-back aria-label="Volver">‹</button>
+      <h2>Confirma tu entrega</h2>
+    </header>
+    <div class="screen-body">
+      <p class="map-hint">Toca el mapa para elegir el punto de entrega 📍</p>
+      <div class="map-box map-pick"><div id="coMap" title="Mapa de entrega"></div></div>
+
+      <div class="place-card">
+        <span class="place-pin">📍</span>
+        <div>
+          <strong id="coBranchName"></strong>
+          <small id="coBranchZone" class="muted"></small>
+        </div>
+      </div>
+
+      <h3 class="sub-title">Sucursal que te atiende</h3>
+      <div id="coBranches" class="chips"></div>
+
+      <div class="info-grid">
+        <div><span>Tiempo</span><strong id="coEta"></strong></div>
+        <div><span>Envío</span><strong id="coFee"></strong></div>
+        <div><span>Distancia</span><strong id="coKm"></strong></div>
+      </div>
+
+      <div class="place-card">
+        <span class="place-pin">🏠</span>
+        <div class="grow">
+          <small class="muted">Entrega en</small>
+          <strong id="coAddress"></strong>
+        </div>
+        <button id="btnChangeAddr" class="link-small" type="button">Cambiar</button>
+      </div>
+
+      <div id="addrEditor" class="addr-editor">
+        <label>Mis lugares</label>
+        <div id="coPlaces" class="chips"></div>
+        <label for="coAddrInput">Otra dirección de entrega</label>
+        <input id="coAddrInput" type="text" placeholder="Calle, número y colonia, Tizayuca" autocomplete="street-address">
+        <div class="addr-actions">
+          <button id="btnUseAddr" class="btn btn-main" type="button">Usar esta dirección</button>
+          <button id="btnGeo" class="btn btn-ghost" type="button">📍 Mi ubicación</button>
+        </div>
+        <label class="check"><input type="checkbox" id="coSavePlace"> Guardar este lugar en mis direcciones</label>
+        <p id="addrMsg" class="muted">También puedes tocar el mapa para marcar el punto exacto.</p>
+      </div>
+
+      <p id="coWarn" class="warn hidden"></p>
+
+      <h3 class="sub-title">Tu pedido</h3>
+      <div class="coupon-box"><label for="couponInput">¿Tienes un cupón?</label><div class="coupon-actions"><input id="couponInput" type="text" maxlength="30" placeholder="Código de descuento"><button id="applyCoupon" class="btn btn-ghost" type="button">Aplicar</button><button id="removeCoupon" class="link-btn hidden" type="button">Quitar</button></div><p class="muted">TIZA10: 10% en comida · ENVIOGRATIS: sin envío · AHORRA20: $20 menos desde $100 en comida. Uno por pedido.</p><p id="couponMessage" role="status"></p></div>
+      <div id="coItems" class="summary"></div>
+    </div>
+    <footer class="screen-foot">
+      <button id="btnFinalize" class="btn btn-main wide">Finalizar pedido</button>
+    </footer>
+  </section>
+
+  <!-- ========== PANTALLA: SEGUIMIENTO ========== -->
+  <section id="trackScreen" class="screen" aria-hidden="true">
+    <header class="screen-head">
+      <button class="back" data-back aria-label="Volver">‹</button>
+      <h2>Estado del pedido</h2>
+    </header>
+    <div id="trackBody" class="screen-body"></div>
+  </section>
+
+  <!-- ========== MODAL PRODUCTO (PERSONALIZAR) ========== -->
+  <div id="productModal" class="modal" aria-hidden="true">
+    <div class="modal-card sheet" role="dialog" aria-modal="true">
+      <button class="close" data-close aria-label="Cerrar">✕</button>
+      <button id="pFav" class="fav-big" aria-label="Favorito">♡</button>
+      <div id="pImage" class="p-image"></div>
+      <div class="p-body">
+        <div class="p-head">
+          <h3 id="pName"></h3>
+          <strong id="pPrice" class="p-price"></strong>
+        </div>
+        <p id="pDesc" class="muted"></p>
+        <div class="p-rating">⭐ <strong id="pRating"></strong> <small id="pReviewCount" class="muted"></small><button id="pWrite" class="mini-link" type="button">✍️ Opinar</button></div>
+
+        <h4 class="sheet-title">Personaliza tu pedido 🧀</h4>
+        <div id="pExtras" class="extras"></div>
+
+        <div id="pReviewsList" class="reviews"></div>
+
+        <div class="p-actions">
+          <div class="qty">
+            <button id="qtyMinus" aria-label="Quitar uno">−</button>
+            <span id="qtyNum">1</span>
+            <button id="qtyPlus" aria-label="Agregar uno">+</button>
+          </div>
+          <button id="btnAddCart" class="btn btn-ghost">🛒 Agregar</button>
+        </div>
+        <button id="btnBuy" class="btn btn-main wide">Continuar · <span id="buyTotal"></span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL ESCRIBIR RESEÑA ========== -->
+  <div id="reviewModal" class="modal" aria-hidden="true">
+    <div class="modal-card review-card" role="dialog" aria-modal="true">
+      <button class="close" data-close aria-label="Cerrar">✕</button>
+      <h3>Escribe tu reseña</h3>
+      <p class="muted">Tu opinión ayuda a otros clientes a elegir.</p>
+      <label for="rvProduct">¿Qué probaste?</label>
+      <select id="rvProduct" class="catalog-select"></select>
+      <label>Tu calificación</label>
+      <div id="rvStars" class="star-pick" role="radiogroup" aria-label="Calificación">
+        <button type="button" data-s="1" aria-label="1 estrella">★</button><button type="button" data-s="2" aria-label="2 estrellas">★</button><button type="button" data-s="3" aria-label="3 estrellas">★</button><button type="button" data-s="4" aria-label="4 estrellas">★</button><button type="button" data-s="5" aria-label="5 estrellas">★</button>
+      </div>
+      <label for="rvText">Tu comentario</label>
+      <textarea id="rvText" maxlength="220" rows="4" placeholder="Cuéntanos qué tal estuvo el sabor, el empaque, la entrega…"></textarea>
+      <small id="rvCount" class="muted">0 / 220</small>
+      <p id="rvError" class="error" role="alert"></p>
+      <button id="btnSendReview" class="btn btn-main wide">Publicar reseña</button>
+    </div>
+  </div>
+
+  <!-- ========== MODAL CONFIRMAR LUGAR ========== -->
+  <div id="confirmModal" class="modal" aria-hidden="true">
+    <div class="modal-card confirm-card" role="dialog" aria-modal="true">
+      <div class="confirm-icon">📍</div>
+      <h3>¿Confirmas el lugar?</h3>
+      <p class="muted">Tu pedido saldrá de <strong id="cfBranch"></strong> y llegará a:</p>
+      <p class="confirm-address" id="cfAddress"></p>
+      <p class="muted">Tiempo estimado: <strong id="cfEta"></strong> · Total: <strong id="cfTotal"></strong></p>
+      <div class="confirm-actions">
+        <button class="btn btn-ghost" data-close>Cambiar</button>
+        <button id="btnConfirmOrder" class="btn btn-main">Sí, confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL PAGO CON TARJETA ========== -->
+  <div id="payModal" class="modal" aria-hidden="true">
+    <div class="modal-card pay-card" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+      <button class="close" data-close aria-label="Cerrar">✕</button>
+      <h3 id="payTitle">Método de pago</h3>
+      <p class="muted pay-sub">Total a pagar: <strong id="payTotal"></strong></p>
+      <input id="paymentMethod" type="hidden" value="">
+      <div class="payment-options" role="group" aria-label="Elige cómo pagar">
+        <button type="button" class="payment-option" data-payment="Tarjeta" aria-pressed="false"><span aria-hidden="true">💳</span><strong>Tarjeta</strong></button>
+        <button type="button" class="payment-option" data-payment="Efectivo" aria-pressed="false"><span aria-hidden="true">💵</span><strong>Efectivo</strong></button>
+        <button type="button" class="payment-option" data-payment="Transferencia" aria-pressed="false"><span aria-hidden="true">🏦</span><strong>Transferencia</strong></button>
+      </div>
+      <p id="paymentNotice" class="muted hidden"></p>
+
+      <div id="cardFields" class="hidden"><div id="ccCard" class="credit-card" aria-hidden="true">
+        <div class="cc-inner">
+          <div class="cc-face cc-front">
+            <div class="cc-top"><span class="cc-chip"></span><span id="ccBrand" class="cc-brand">TARJETA</span></div>
+            <div id="ccShowNumber" class="cc-number">•••• •••• •••• ••••</div>
+            <div class="cc-bottom"><span>VENCE</span><strong id="ccShowExp">MM/AA</strong></div>
+          </div>
+          <div class="cc-face cc-back">
+            <div class="cc-stripe"></div>
+            <div class="cc-cvv"><span>CVV</span><strong id="ccShowCvv">•••</strong></div>
+          </div>
+        </div>
+      </div>
+
+      </div><form id="payForm" class="hidden" novalidate autocomplete="off">
+        <div id="cardInputs" class="hidden"><label for="ccNumber">Número de tarjeta</label>
+        <input id="ccNumber" type="text" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" autocomplete="off">
+        <div class="pay-row">
+          <div><label for="ccExp">Vence</label><input id="ccExp" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" autocomplete="off"></div>
+          <div><label for="ccCvv">CVV</label><input id="ccCvv" type="password" inputmode="numeric" maxlength="4" placeholder="123" autocomplete="off"></div>
+        </div>
+        </div><div id="cashFields" class="hidden">
+          <label for="cashAmount">¿Con cuánto vas a pagar?</label>
+          <input id="cashAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Ej. 200.00" aria-describedby="cashChange">
+          <p id="cashChange" class="muted" aria-live="polite"></p>
+        </div>
+        <div id="transferFields" class="hidden">
+          <p id="transferDetails" class="muted" style="white-space: pre-line"></p>
+          <label for="transferReference">Referencia o clave de rastreo</label>
+          <input id="transferReference" type="text" maxlength="100" placeholder="Referencia de tu transferencia" autocomplete="off" aria-describedby="transferHelp">
+          <p id="transferHelp" class="muted">La referencia se incluirá en tu ticket. La sucursal debe verificar el pago antes de confirmarlo.</p>
+        </div>
+        <p id="payError" class="error" role="alert"></p>
+        <button id="btnPay" class="btn btn-main wide" type="submit">Pagar</button>
+        <p class="demo-note">Pago de demostración: no se cobra nada y tu tarjeta no se guarda (en el ticket solo se ven los últimos 4 dígitos).</p>
+      </form>
+
+      <div id="payOverlay" class="pay-overlay" aria-live="polite">
+        <div class="pay-state pay-processing">
+          <div class="spinner"></div>
+          <strong>Procesando pago…</strong>
+          <small>No cierres esta ventana</small>
+        </div>
+        <div class="pay-state pay-success">
+          <div class="confetti" aria-hidden="true"><i style="--a:0deg;--c:#ffb703"></i><i style="--a:30deg;--c:#d62828"></i><i style="--a:60deg;--c:#16a34a"></i><i style="--a:90deg;--c:#7e22ce"></i><i style="--a:120deg;--c:#0ea5e9"></i><i style="--a:150deg;--c:#ff8c00"></i><i style="--a:180deg;--c:#ffb703"></i><i style="--a:210deg;--c:#d62828"></i><i style="--a:240deg;--c:#16a34a"></i><i style="--a:270deg;--c:#7e22ce"></i><i style="--a:300deg;--c:#0ea5e9"></i><i style="--a:330deg;--c:#ff8c00"></i></div>
+          <svg class="pay-check" viewBox="0 0 52 52" aria-hidden="true"><circle class="pc-circle" cx="26" cy="26" r="24"/><path class="pc-mark" d="M14 27 l8 8 16-17"/></svg>
+          <strong>¡Pago aprobado!</strong>
+          <small>Preparando tu pedido…</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL TICKET ========== -->
+  <div id="ticketModal" class="modal" aria-hidden="true">
+    <div class="modal-card ticket-wrap" role="dialog" aria-modal="true">
+      <button class="close" data-close aria-label="Cerrar">✕</button>
+      <div id="ticket" class="ticket"></div>
+      <div class="ticket-actions">
+        <button id="btnPrint" class="btn btn-ghost">Guardar PDF</button>
+        <button class="btn btn-main" data-close>Listo</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="firebaseMigrationModal" class="modal" aria-hidden="true"><div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="migrationTitle"><button class="close" data-close aria-label="Cerrar vinculación">✕</button><h3 id="migrationTitle">Pasar mi cuenta a Firebase</h3><p class="muted">Solo una vez. Comprueba tu cuenta anterior y elige el correo que usarás para entrar. Se conservan tus datos y permisos.</p><form id="firebaseMigrationForm" novalidate><label for="migrationLegacyUsername">Usuario o correo anterior</label><input id="migrationLegacyUsername" autocomplete="username"><label for="migrationLegacyPassword">Contraseña anterior</label><div class="password-control"><input id="migrationLegacyPassword" type="password" minlength="8" maxlength="256" autocomplete="off"><button type="button" class="password-toggle" data-password-toggle="migrationLegacyPassword" aria-label="Mostrar contraseña" aria-controls="migrationLegacyPassword" aria-pressed="false">👁</button></div><label for="migrationMode">Cuenta de Firebase</label><select id="migrationMode" class="catalog-select"><option value="create">Crear mi cuenta en Firebase</option><option value="existing">Ya tengo correo y contraseña en Firebase</option></select><label for="migrationEmail">Correo de Firebase</label><input id="migrationEmail" type="email" autocomplete="email"><p class="muted">Si eres cliente, usa el mismo correo de tu cuenta anterior para conservar tus pedidos.</p><label for="migrationPassword">Contraseña de Firebase</label><div class="password-control"><input id="migrationPassword" type="password" minlength="8" maxlength="256" autocomplete="off"><button type="button" class="password-toggle" data-password-toggle="migrationPassword" aria-label="Mostrar contraseña" aria-controls="migrationPassword" aria-pressed="false">👁</button></div><div id="migrationConfirmField"><label for="migrationPasswordConfirm">Confirmar contraseña de Firebase</label><div class="password-control"><input id="migrationPasswordConfirm" type="password" minlength="8" maxlength="256" autocomplete="off"><button type="button" class="password-toggle" data-password-toggle="migrationPasswordConfirm" aria-label="Mostrar contraseña" aria-controls="migrationPasswordConfirm" aria-pressed="false">👁</button></div></div><p id="migrationError" class="error" role="alert"></p><button id="migrationSubmit" class="btn btn-main wide" type="submit">Vincular y entrar</button></form></div></div>
+
+  <div id="deliveryRatingModal" class="modal" aria-hidden="true"><div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="deliveryRatingTitle"><button class="close" data-close aria-label="Cerrar calificación">✕</button><h3 id="deliveryRatingTitle">Calificar la entrega</h3><p id="deliveryRatingFolio" class="muted"></p><form id="deliveryRatingForm" novalidate><fieldset class="delivery-stars"><legend>¿Cómo fue tu entrega?</legend><label><input type="radio" name="deliveryStars" value="1"><span>1 ★</span></label><label><input type="radio" name="deliveryStars" value="2"><span>2 ★</span></label><label><input type="radio" name="deliveryStars" value="3"><span>3 ★</span></label><label><input type="radio" name="deliveryStars" value="4"><span>4 ★</span></label><label><input type="radio" name="deliveryStars" value="5"><span>5 ★</span></label></fieldset><label for="deliveryRatingComment">Comentario (opcional)</label><textarea id="deliveryRatingComment" maxlength="300" placeholder="Cuéntanos cómo llegó tu pedido"></textarea><p id="deliveryRatingError" class="error" role="alert"></p><button id="saveDeliveryRating" class="btn btn-main wide" type="submit">Guardar calificación</button></form></div></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script id="transferDemoConfig" type="application/json">{"bank":"BBVA","holder":"Tizafood","clabe":"1245879065234590","demo":true}</script>
+  <script id="schoolSeed" type="application/json">{"_info":"Base de datos de Tiza Food. Edita productos, promociones, sucursales y extras aquí. Con 'node server.js' también guarda reseñas y pedidos.","products":[{"id":1,"name":"Hamburguesa Clásica","cat":"Hamburguesas","price":59,"emoji":"🍔","img":"img/hamburguesa.jpg","desc":"Carne de res a la parrilla, queso, lechuga, jitomate y nuestra salsa especial.","rating":4.7},{"id":2,"name":"Doble Queso","cat":"Hamburguesas","price":79,"emoji":"🍔","img":"img/doble-queso.jpg","desc":"Doble carne, doble queso cheddar, cebolla caramelizada y pan de mantequilla.","rating":5},{"id":3,"name":"Pollo Crujiente","cat":"Hamburguesas","price":69,"emoji":"🐔","img":"img/pollo.jpg","desc":"Pechuga empanizada y crujiente con mayonesa de chipotle y lechuga fresca.","rating":5},{"id":11,"name":"Hamburguesa BBQ","cat":"Hamburguesas","price":75,"emoji":"🍔","img":"img/bbq.jpg","desc":"Carne de res, aros de cebolla, tocino y salsa BBQ ahumada.","rating":4.8},{"id":12,"name":"Hamburguesa Hawaiana","cat":"Hamburguesas","price":72,"emoji":"🍍","img":"img/hawaiana-burger.jpg","desc":"Carne de res con piña asada, jamón y queso derretido.","rating":4.4},{"id":4,"name":"Hot Dog Jumbo","cat":"Snacks","price":39,"emoji":"🌭","img":"img/hotdog.jpg","desc":"Salchicha jumbo, tocino, cebolla, jitomate y aderezos al gusto.","rating":3.7},{"id":5,"name":"Papas Grandes","cat":"Snacks","price":35,"emoji":"🍟","img":"img/papas.jpg","desc":"Papas doradas y crujientes con sal. Perfectas para compartir.","rating":4.8},{"id":6,"name":"Nuggets (10 pzas)","cat":"Snacks","price":55,"emoji":"🍗","img":"img/nuggets.jpg","desc":"Diez nuggets de pollo con dos salsas a elegir: BBQ o mostaza miel.","rating":5},{"id":7,"name":"Alitas (8 pzas)","cat":"Snacks","price":89,"emoji":"🍖","img":"img/alitas.jpg","desc":"Ocho alitas bañadas en salsa BBQ o búfalo, con aderezo ranch.","rating":4.5},{"id":15,"name":"Aros de Cebolla","cat":"Snacks","price":42,"emoji":"🧅","img":"img/aros.jpg","desc":"Aros empanizados y dorados con aderezo ranch.","rating":4.5},{"id":16,"name":"Nachos con Queso","cat":"Snacks","price":49,"emoji":"🧀","img":"img/nachos.jpg","desc":"Totopos crujientes con queso cheddar derretido y jalapeños.","rating":4.6},{"id":17,"name":"Tacos al Pastor (5)","cat":"Snacks","price":75,"emoji":"🌮","img":"img/tacos.jpg","desc":"Cinco tacos al pastor con piña, cebolla, cilantro y salsa verde.","rating":4.9},{"id":8,"name":"Pizza Personal","cat":"Pizzas","price":65,"emoji":"🍕","img":"img/pizza.jpg","desc":"Pizza individual de pepperoni con mucho queso mozzarella.","rating":4},{"id":13,"name":"Pizza Hawaiana","cat":"Pizzas","price":75,"emoji":"🍍","img":"img/pizza-hawaiana.jpg","desc":"Jamón, piña y queso mozzarella sobre masa recién horneada.","rating":4.3},{"id":14,"name":"Pizza Mexicana","cat":"Pizzas","price":80,"emoji":"🌶️","img":"img/pizza-mexicana.jpg","desc":"Chorizo, jalapeño, cebolla y frijoles con queso mozzarella.","rating":4.6},{"id":9,"name":"Refresco Grande","cat":"Bebidas","price":25,"emoji":"🥤","img":"img/refresco.jpg","desc":"Refresco frío de 600 ml. Pregunta por el sabor del día.","rating":3.7},{"id":10,"name":"Malteada de Fresa","cat":"Bebidas","price":45,"emoji":"🍓","img":"img/malteada.jpg","desc":"Malteada cremosa de fresa con crema batida.","rating":4.6},{"id":18,"name":"Malteada de Chocolate","cat":"Bebidas","price":45,"emoji":"🍫","img":"img/malteada-chocolate.jpg","desc":"Malteada espesa de chocolate con crema batida.","rating":4.7},{"id":19,"name":"Limonada Mineral","cat":"Bebidas","price":30,"emoji":"🍋","img":"img/limonada.jpg","desc":"Limonada natural con agua mineral y mucho hielo.","rating":4.4},{"id":20,"name":"Agua de Horchata","cat":"Bebidas","price":28,"emoji":"🥛","img":"img/horchata.jpg","desc":"Horchata fresca de arroz con canela. 600 ml.","rating":4.5},{"id":21,"name":"Helado de Vainilla","cat":"Postres","price":35,"emoji":"🍦","img":"img/helado.jpg","more":true,"desc":"Tres bolas de helado cremoso de vainilla con galleta.","rating":4.6},{"id":22,"name":"Brownie con Helado","cat":"Postres","price":55,"emoji":"🍫","img":"img/brownie.jpg","more":true,"only":[0,1,2],"desc":"Brownie tibio de chocolate con bola de helado y salsa de chocolate.","rating":4.9},{"id":23,"name":"Pastel de Chocolate","cat":"Postres","price":49,"emoji":"🍰","img":"img/pastel.jpg","more":true,"only":[0,1],"desc":"Rebanada de pastel de chocolate húmedo con betún cremoso.","rating":4.7},{"id":24,"name":"Churros (6 pzas)","cat":"Postres","price":45,"emoji":"🍩","img":"img/churros.jpg","more":true,"desc":"Seis churros crujientes con azúcar y canela, con cajeta o chocolate para mojar.","rating":4.8},{"id":25,"name":"Waffle con Fresas","cat":"Postres","price":59,"emoji":"🧇","img":"img/waffle.jpg","more":true,"only":[0,2],"desc":"Waffle dorado con fresas, crema batida y miel.","rating":4.5},{"id":26,"name":"Flan Napolitano","cat":"Postres","price":38,"emoji":"🍮","img":"img/flan.jpg","more":true,"desc":"Flan casero con caramelo, suave y cremoso.","rating":4.4},{"id":27,"name":"Galletas (3 pzas)","cat":"Postres","price":30,"emoji":"🍪","img":"img/galletas.jpg","more":true,"desc":"Tres galletas grandes con chispas de chocolate, recién horneadas.","rating":4.3},{"id":28,"name":"Café Frío","cat":"Bebidas","price":42,"emoji":"☕","img":"img/cafe-frio.jpg","more":true,"only":[0,1,2],"desc":"Café frío cremoso con hielo, leche y jarabe de vainilla.","rating":4.6},{"id":29,"name":"Té Helado de Durazno","cat":"Bebidas","price":28,"emoji":"🍑","img":"img/te.jpg","more":true,"desc":"Té negro frío con sabor a durazno. 600 ml.","rating":4.2},{"id":30,"name":"Jugo de Naranja","cat":"Bebidas","price":32,"emoji":"🍊","img":"img/jugo.jpg","more":true,"desc":"Jugo de naranja natural recién exprimido. 500 ml.","rating":4.7},{"id":31,"name":"Agua Natural","cat":"Bebidas","price":15,"emoji":"💧","img":"img/agua.jpg","more":true,"desc":"Botella de agua natural de 600 ml.","rating":4},{"id":32,"name":"Frappé de Oreo","cat":"Bebidas","price":52,"emoji":"🥤","img":"img/frappe.jpg","more":true,"only":[0,1],"desc":"Frappé helado de galleta Oreo con crema batida.","rating":4.8},{"id":33,"name":"Hamburguesa Vegetariana","cat":"Hamburguesas","price":69,"emoji":"🥗","img":"img/veggie.jpg","more":true,"desc":"Medallón de lentejas y avena con aguacate, jitomate y lechuga.","rating":4.4},{"id":34,"name":"Mini Burgers (3 pzas)","cat":"Hamburguesas","price":65,"emoji":"🍔","img":"img/mini-burgers.jpg","more":true,"desc":"Tres mini hamburguesas con queso, ideales para compartir.","rating":4.6},{"id":35,"name":"Esquites","cat":"Snacks","price":35,"emoji":"🌽","img":"img/esquites.jpg","more":true,"desc":"Elote en vaso con mayonesa, queso, chile y limón.","rating":4.5},{"id":36,"name":"Dedos de Queso (6)","cat":"Snacks","price":45,"emoji":"🧀","img":"img/dedos-queso.jpg","more":true,"desc":"Seis dedos de queso mozzarella empanizados con salsa marinara.","rating":4.6},{"id":37,"name":"Pizza 4 Quesos","cat":"Pizzas","price":85,"emoji":"🧀","img":"img/pizza-4quesos.jpg","more":true,"desc":"Mozzarella, cheddar, parmesano y queso crema sobre masa artesanal.","rating":4.7},{"id":38,"name":"Pizza Familiar","cat":"Pizzas","price":150,"emoji":"🍕","img":"img/pizza-familiar.jpg","more":true,"only":[0,2,3],"desc":"Pizza grande de 8 rebanadas, elige tu especialidad.","rating":4.8}],"promos":[{"name":"Hamburguesa Especial","cat":"Hamburguesas","price":85,"img":"img/hamburguesa.jpg","emoji":"🍔","tag":"bestseller","tagText":"MÁS VENDIDO","short":"Carne de res + Queso + Tocino","desc":"Jugosa carne de res a la parrilla con queso fundido, lechuga fresca y jitomate."},{"name":"Pizza Peperoni","cat":"Pizzas","price":120,"img":"img/pizza.jpg","emoji":"🍕","tag":"popular","tagText":"POPULAR","short":"Queso Mozzarella + Peperoni","desc":"Masa crujiente horneada al momento con abundante queso mozzarella y peperoni."},{"name":"Papas Preparadas","cat":"Snacks","price":45,"img":"img/papas.jpg","emoji":"🍟","tag":"save","tagText":"Ahorra 15%","short":"Crujientes con Especias","desc":"Papas a la francesa doraditas y sazonadas con especias de la casa."},{"name":"Combo Pareja","cat":"Combos","price":159,"img":"img/combo-pareja.jpg","emoji":"💑","tag":"save","tagText":"Ahorra $30","short":"2 hamburguesas + papas + 2 refrescos","desc":"Dos hamburguesas clásicas, papas grandes para compartir y dos refrescos fríos."},{"name":"Combo Familiar","cat":"Combos","price":239,"img":"img/combo-familiar.jpg","emoji":"👨‍👩‍👧‍👦","tag":"popular","tagText":"FAMILIAR","short":"Pizza + 8 alitas + refresco 2 L","desc":"Pizza grande de pepperoni, ocho alitas BBQ o búfalo y refresco de 2 litros."},{"name":"Combo Kids","cat":"Combos","price":69,"img":"img/combo-kids.jpg","emoji":"🧸","tag":"bestseller","tagText":"KIDS","short":"6 nuggets + papas + jugo","desc":"Seis nuggets de pollo, papas chicas y jugo. Incluye sorpresa."},{"name":"2x1 en Hot Dogs","cat":"Snacks","price":59,"img":"img/hotdog.jpg","emoji":"🌭","tag":"save","tagText":"2x1","short":"Dos hot dogs jumbo","desc":"Dos hot dogs jumbo con tocino, cebolla, jitomate y aderezos al gusto."},{"name":"Martes de Alitas","cat":"Snacks","price":75,"img":"img/alitas.jpg","emoji":"🍖","tag":"popular","tagText":"-15%","short":"8 alitas BBQ o búfalo","desc":"Ocho alitas bañadas en la salsa que elijas, con aderezo ranch."},{"name":"Combo Taquero","cat":"Combos","price":99,"img":"img/tacos.jpg","emoji":"🌮","tag":"bestseller","tagText":"NUEVO","short":"5 tacos al pastor + 2 refrescos","desc":"Cinco tacos al pastor con piña y salsa verde, más dos refrescos."},{"name":"Malteada Doble","cat":"Bebidas","price":69,"img":"img/malteada.jpg","emoji":"🍓","tag":"save","tagText":"Ahorra 25%","short":"2 malteadas a elegir","desc":"Dos malteadas cremosas con crema batida. Elige fresa o chocolate."}],"branches":[{"name":"Sucursal Centro","zone":"Centro, Tizayuca","km":0.8},{"name":"Sucursal Haciendas","zone":"Haciendas de Tizayuca","km":2.4},{"name":"Sucursal Tizayuca Sur","zone":"Carretera México-Pachuca","km":3.9},{"name":"Sucursal Ex Hacienda","zone":"Fracc. Ex Hacienda, Tizayuca","km":5.5}],"extras":{"Hamburguesas":[{"name":"Extra queso","price":15},{"name":"Carne extra","price":25},{"name":"Tocino crujiente","price":20},{"name":"Aguacate","price":15},{"name":"Jalapeños","price":8}],"Snacks":[{"name":"Queso cheddar","price":12},{"name":"Salsa extra","price":5},{"name":"Tocino","price":15},{"name":"Aderezo ranch","price":8}],"Pizzas":[{"name":"Extra queso","price":20},{"name":"Peperoni extra","price":20},{"name":"Champiñones","price":15},{"name":"Orilla rellena","price":25}],"Bebidas":[{"name":"Crema batida","price":10},{"name":"Shot de chocolate","price":12},{"name":"Tamaño grande","price":10}],"Postres":[{"name":"Bola de helado","price":15},{"name":"Cajeta","price":8},{"name":"Crema batida","price":10},{"name":"Chispas de chocolate","price":8}],"Combos":[{"name":"Extra queso","price":15},{"name":"Papas grandes","price":15},{"name":"Salsa extra","price":5},{"name":"Cambiar a malteada","price":20}]},"reviews":[{"id":"s0","user":"jin s.","product":"Hamburguesa Clásica","comment":"Súper crujientes y calientitas.","stars":5,"date":null},{"id":"s1","user":"yoongi m.","product":"Doble Queso","comment":"Muy buenas la recomiendo.","stars":5,"date":null},{"id":"s2","user":"Luis R.","product":"Pollo Crujiente","comment":"Súper crujientes y me llegaron en buen estado.","stars":5,"date":null},{"id":"s3","user":"hoseok j.","product":"Hot Dog Jumbo","comment":"Súper buenas 10/10 y calientitas.","stars":5,"date":null},{"id":"s4","user":"jimin p.","product":"Papas Grandes","comment":"Súper crujientes y calientitas.","stars":5,"date":null},{"id":"s5","user":"Taehyung k.","product":"Nuggets (10 pzas)","comment":"Igual a la imagen, recomiendo 10/10.","stars":5,"date":null},{"id":"s6","user":"jungkook j.","product":"Alitas (8 pzas)","comment":"Tienen un sabor bueno pero pueden mejorar.","stars":5,"date":null},{"id":"s7","user":"Loki R.","product":"Pizza Personal","comment":"Muy buena para comer en familia y disfrutar en casa.","stars":5,"date":null},{"id":"s8","user":"maria R.","product":"Refresco Grande","comment":"Buena","stars":5,"date":null},{"id":"s9","user":"Luis R.","product":"Malteada de Fresa","comment":"Súper dulce 10/10.","stars":5,"date":null}],"transfer":{"bank":"BBVA","holder":"Tizafood","clabe":"1245879065234590","demo":true},"orders":[]}</script>
+  <script src="management.js?v=20261019-coupons-ratings-1"></script>
+  <script src="firebase-config.js?v=20261020-firebase-all-1"></script>
+  <script src="firebase-auth.js?v=20261020-firebase-all-1"></script>
+  <script src="legacy-accounts.js?v=20261020-firebase-all-1"></script>
+  <script src="school-demo.js?v=20261020-firebase-all-1"></script>
+  <script src="app.js?v=20261020-firebase-all-1"></script>
+  <script src="admin.js?v=20261020-firebase-all-1"></script>
+</body>
+</html>

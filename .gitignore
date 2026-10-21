@@ -1,0 +1,22 @@
+# Datos privados o generados por cada instalación
+/db.json
+/usuarios.json
+/ticket-*.html
+/ticket-*.pdf
+/tizafood-recuperacion*.txt
+*.tmp
+*.log
+.env
+.env.*
+!.env.example
+*-firebase-adminsdk-*.json
+*service-account*.json
+serviceAccount*.json
+node_modules/
+.DS_Store
+Thumbs.db
+# Archivos retirados de Authenticator; el acceso actual solo usa Firebase
+/totp.js
+/two-step.js
+/vendor/
+/GUIA-AUTHENTICATOR.md

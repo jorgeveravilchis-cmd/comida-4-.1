@@ -1,5 +1,5 @@
 /* Reglas compartidas por el servidor y la demostración escolar. */
-(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.FoodManagement=factory();})(typeof globalThis!=='undefined'?globalThis:this,function(){
+(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory(require('./hours'));else root.FoodManagement=factory(root.FoodHours);})(typeof globalThis!=='undefined'?globalThis:this,function(Hours){
   const states=['Recibido','En preparación','En camino','Entregado'];
   const statusOf=o=>o.cancelled||o.status==='Cancelado'?'Cancelado':o.status==='Pedido recibido'?'Recibido':states.includes(o.status)?o.status:'Recibido';
   function advance(order,status,by){
@@ -43,8 +43,10 @@
       return previous;
     }
     if(!incoming.items||!incoming.items.length)throw Error('El pedido debe incluir productos.');
+    const deliveryNotes=String(incoming.deliveryNotes||'').trim();if(deliveryNotes.length>300||/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(deliveryNotes))throw Error('Revisa las instrucciones de entrega: máximo 300 caracteres.');
+    const service=Hours.status(db.hours);if(!service.open)throw Error(service.text+'. No se pueden confirmar pedidos fuera de horario.');
     available(incoming.items,db);
-    return {...incoming,...pricing(incoming.items,incoming.fee,incoming.couponCode),deliveryRating:undefined,owner:user.email,customer:user.name,status:'Recibido',cancelled:false,managed:true,ts:Date.now(),statusHistory:[{status:'Recibido',at:Date.now(),by:user.name}]};
+    return {...incoming,deliveryNotes,...pricing(incoming.items,incoming.fee,incoming.couponCode),deliveryRating:undefined,owner:user.email,customer:user.name,status:'Recibido',cancelled:false,managed:true,ts:Date.now(),statusHistory:[{status:'Recibido',at:Date.now(),by:user.name}]};
   }
   const day=ts=>new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Mexico_City',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(ts));
   function summary(orders,period='today',now=Date.now()){
@@ -55,5 +57,7 @@
     return out;
   }
   function validImage(value){return value==='' || /^img\/[^\x00-\x1f]+$/.test(value) || (value.length<=220000 && /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(value));}
-  return {states,statusOf,advance,available,accept,summary,validImage,pricing,rate};
+  const imageAliases={"img/nuggets.jpg":"img/Nuggets.jpg","img/alitas.jpg":"img/Alitas.jpg","img/cafe-frio.jpg":"img/cafefrio.jpg","img/mini-burgers.jpg":"img/mini-bu.jpg","img/pizza-familiar.jpg":"img/famili.jpg","img/combo-pareja.jpg":"img/combopareja.jpg","img/combo-familiar.jpg":"img/combo-familiar.webp"};
+  const imagePath=value=>imageAliases[value]||value;
+  return {imagePath,states,statusOf,advance,available,accept,summary,validImage,pricing,rate};
 });

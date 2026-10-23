@@ -1,8 +1,8 @@
 /* Demostración escolar local. No sustituye un servidor con seguridad real. */
 (() => {
-  if (location.protocol !== 'file:') return;
+  if(location.protocol!=='file:'&&!['tizafood.web.app','tizafood.firebaseapp.com'].includes(location.hostname))return;
   window.localSchoolDemo = true;
-  const DATA = 'tiza_school_db_v1', USERS = 'tiza_school_users_v1', SESSION = 'tiza_school_session_v1';
+  const DATA = 'tiza_school_db_v1', USERS = 'tiza_school_users_v1', SESSION = 'tiza_school_session_v1', EMAIL_SESSION='tiza_school_email_session_v1';
   const seed = JSON.parse(document.getElementById('schoolSeed').textContent);
   const read = (key, fallback) => {const raw=localStorage.getItem(key);return raw?JSON.parse(raw):fallback;};
   const write = (key, value) => localStorage.setItem(key,JSON.stringify(value));
@@ -12,13 +12,13 @@
   const allUsers = () => {const users=read(USERS,[]);return [...demoAccounts.filter(d=>!users.some(u=>u.username===d.username)),...users];};
   const nativeFetch = window.fetch.bind(window);
   const safe = u => ({name:u.name,username:u.username,email:u.email,role:u.role,address:u.address||'',addressParts:u.addressParts||null,authProvider:u.authProvider||'legacy'});
-  const current = () => allUsers().find(u=>u.username===sessionStorage.getItem(SESSION)&&u.authProvider==='firebase'&&u.firebaseUid);
+  const current = () => allUsers().find(u=>u.username===FoodSession.getItem(SESSION)&&u.authProvider==='firebase'&&u.firebaseUid&&(u.role!=='cliente'||FoodSession.getItem(EMAIL_SESSION)===u.firebaseUid));
   const reply = (status,data) => new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json'}});
   const fail = (message,status=400) => {const e=Error(message);e.status=status;throw e;};
   const requireUser = roles => {const user=current();if(!user)fail('Inicia sesión.',401);if(roles&&!roles.includes(user.role))fail('No tienes permiso para esta acción.',403);return user;};
   const migrationAttempts=new Map();
   const service=()=>{if(!window.FoodFirebase)fail('Recarga la app con Ctrl + F5.');return FoodFirebase.client(nativeFetch);};
-  const enter=user=>{sessionStorage.setItem(SESSION,user.username);return reply(200,{user:safe(user)});};
+  const enter=(user,proof,remember)=>{FoodFirebaseSession.requireEmail(user,proof);FoodSession.save(user,proof,remember);return reply(200,{user:safe(user)});};
   async function legacyAccount(b){
     const username=String(b.legacyUsername||'').trim().toLowerCase(),password=String(b.legacyPassword||'');
     const attempts=migrationAttempts.get(username)||{count:0,until:0};if(attempts.until>Date.now())fail('Espera 15 minutos antes de volver a intentar vincular esta cuenta.',429);
@@ -34,16 +34,27 @@
   window.fetch=(input,options={})=>{
     const url=new URL(typeof input==='string'?input:input.url,location.href);
     const marker=url.pathname.lastIndexOf('/api/');
-    if(url.protocol!=='file:'||marker<0)return nativeFetch(input,options);
+    if(url.origin!==location.origin||marker<0)return nativeFetch(input,options);
     const task=queue.then(async()=>{
       try {
         const route=url.pathname.slice(marker+5),method=options.method||'GET',b=options.body?JSON.parse(options.body):{};
         const db=read(DATA,seed);
+        for(const item of [...(db.products||[]),...(db.promos||[])])item.img=FoodManagement.imagePath(item.img);
         if(route==='db'&&method==='GET'){const out={...db};delete out.orders;return reply(200,out);}
+        if(route==='firebase-registration-check'&&method==='POST'){const details=FoodFirebase.registration(b);FoodFirebase.available(allUsers(),details);return reply(200,{ok:true});}
+        if(['firebase-prepare','firebase-session'].includes(route)&&method==='POST'){
+          FoodSession.removeItem(SESSION);FoodSession.removeItem(EMAIL_SESSION);
+          const identity=await FoodFirebaseSession.identity(nativeFetch,b.idToken),details=b.details?FoodFirebase.registration({...b.details,email:identity.email},false):null;
+          const user=FoodFirebase.profile(identity,allUsers(),details);
+          if(b.staffRole&&user.role!==b.staffRole)fail('Esta cuenta no tiene permiso para este panel.',403);
+          write(USERS,FoodFirebase.store(read(USERS,[]),user));
+          if(route==='firebase-prepare')return reply(200,{role:user.role,emailVerified:identity.emailVerified,requiresEmailVerification:user.role==='cliente'});
+          return enter(user,identity,b.remember);
+        }
         if(route==='setup-status')return reply(200,{needsOwner:false});
         if(route==='setup-owner')fail('Vincula la cuenta anterior del dueño con el botón Pasar mi cuenta anterior a Firebase.',403);
         if(['login','register','firebase-migrate'].includes(route)&&method==='POST'){
-          sessionStorage.removeItem(SESSION);let user;
+          FoodSession.removeItem(SESSION);let user;
           if(route==='firebase-migrate'){
             const legacy=await legacyAccount(b);
             const identity=b.createAccount===true?await service().signUp(b.email,b.password):await service().signIn(b.email,b.password);
@@ -53,12 +64,12 @@
             let details=null;if(route==='register'){details=FoodFirebase.registration(b);FoodFirebase.available(allUsers(),details);}
             const identity=route==='register'?await service().signUp(details.email,b.password):await service().signIn(b.email||b.username,b.password);
             user=FoodFirebase.profile(identity,allUsers(),details);
-            if(b.staffRole&&b.staffRole!==user.role)fail('Ese correo no tiene acceso a este panel. Vincula primero tu cuenta anterior.',403);
+            if(b.staffRole&&b.staffRole!==user.role)fail('Esta cuenta no tiene permiso para este panel. Ingresa con una cuenta autorizada.',403);
             write(USERS,FoodFirebase.store(read(USERS,[]),user));
           }
-          return enter(user);
+          return enter(user,undefined,b.remember);
         }
-        if(route==='logout'){sessionStorage.removeItem(SESSION);return reply(200,{ok:true});}
+        if(route==='logout'){FoodSession.removeItem(SESSION);FoodSession.removeItem(EMAIL_SESSION);return reply(200,{ok:true});}
         if(route==='me')return reply(200,{user:safe(requireUser())});
         if(route.startsWith('admin/')) {
           requireUser(['dueno','empleado']);
@@ -69,6 +80,7 @@
             db.orders[index]=FoodManagement.advance(db.orders[index],b.status,current().name);write(DATA,db);return reply(200,{order:db.orders[index]});
           }
           requireUser(['dueno']);
+          if(route==='admin/hours'){if(method==='GET')return reply(200,{hours:db.hours||FoodHours.defaults()});if(method==='PUT'){db.hours=FoodHours.validate(b);write(DATA,db);return reply(200,{hours:db.hours});}}
           if(route==='admin/summary'&&method==='GET')return reply(200,FoodManagement.summary(db.orders||[],url.searchParams.get('period')==='all'?'all':'today'));
           const availability=route.match(/^admin\/products\/(\d+)\/availability$/);
           if(availability&&method==='PATCH'){

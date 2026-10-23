@@ -13,7 +13,7 @@
     const data=await request('admin/orders');
     el('staffOrderList').innerHTML=data.orders.length?data.orders.map(o=>{
       const status=FoodManagement.statusOf(o),index=FoodManagement.states.indexOf(status),next=index>=0?FoodManagement.states[index+1]:null;
-      return '<article class="staff-record"><h3>Pedido '+escape(o.folio)+'</h3><p>'+escape(o.date)+' · '+escape(o.branch)+'</p><p>Cliente: '+escape(o.customer||o.owner)+'</p><p>Entrega: '+escape(o.address)+'</p><ul>'+(o.items||[]).map(i=>'<li>'+escape(i.qty)+' × '+escape(i.name)+'</li>').join('')+'</ul><p><strong>Total: '+price(o.total)+'</strong></p><p>Pago: '+escape(o.payment&&o.payment.method)+' · '+escape(o.payment&&o.payment.status||'Sin estado de cobro')+'</p>'+(o.payment&&o.payment.reference?'<p>Referencia: '+escape(o.payment.reference)+'</p>':'')+(o.payment&&o.payment.demo?'<p>Pago de demostración. Sin cobro real.</p>':'')+(o.payment&&o.payment.method==='Efectivo'?'<p>Paga con: '+price(o.payment.cashAmount)+' · Cambio: '+price(o.payment.change)+'</p>':'')+(o.discount>0?'<p>Cupón '+escape(o.couponCode)+': −'+price(o.discount)+'</p>':'')+(o.deliveryRating?'<p>Calificación de entrega: <strong>'+o.deliveryRating.stars+' de 5 ★</strong></p><p>'+escape(o.deliveryRating.comment)+'</p>':'')+'<p>Estado: <strong>'+escape(status)+'</strong></p>'+(next?'<button type="button" class="btn btn-main" data-advance-order="'+escape(o.folio)+'" data-next-status="'+escape(next)+'">Pasar a '+escape(next)+'</button>':'')+'</article>';
+      return '<article class="staff-record"><h3>Pedido '+escape(o.folio)+'</h3><p>'+escape(o.date)+' · '+escape(o.branch)+'</p><p>Cliente: '+escape(o.customer||o.owner)+'</p><p>Entrega: '+escape(o.address)+'</p>'+(o.deliveryNotes?'<p>Instrucciones: '+escape(o.deliveryNotes)+'</p>':'')+'<ul>'+(o.items||[]).map(i=>'<li>'+escape(i.qty)+' × '+escape(i.name)+'</li>').join('')+'</ul><p><strong>Total: '+price(o.total)+'</strong></p><p>Pago: '+escape(o.payment&&o.payment.method)+' · '+escape(o.payment&&o.payment.status||'Sin estado de cobro')+'</p>'+(o.payment&&o.payment.reference?'<p>Referencia: '+escape(o.payment.reference)+'</p>':'')+(o.payment&&o.payment.demo?'<p>Pago de demostración. Sin cobro real.</p>':'')+(o.payment&&o.payment.method==='Efectivo'?'<p>Paga con: '+price(o.payment.cashAmount)+' · Cambio: '+price(o.payment.change)+'</p>':'')+(o.discount>0?'<p>Cupón '+escape(o.couponCode)+': −'+price(o.discount)+'</p>':'')+(o.deliveryRating?'<p>Calificación de entrega: <strong>'+o.deliveryRating.stars+' de 5 ★</strong></p><p>'+escape(o.deliveryRating.comment)+'</p>':'')+'<p>Estado: <strong>'+escape(status)+'</strong></p>'+(next?'<button type="button" class="btn btn-main" data-advance-order="'+escape(o.folio)+'" data-next-status="'+escape(next)+'">Pasar a '+escape(next)+'</button>':'')+'</article>';
     }).join(''):'<p>Todavía no hay pedidos. Crea uno desde una cuenta de cliente y aparecerá aquí.</p>';
   }
   async function sales() {
@@ -29,11 +29,13 @@
   async function employees() {
     const data=await request('admin/employees');el('staffEmployeeList').innerHTML=data.users.map(u=>'<article class="staff-record"><strong>'+escape(u.name)+'</strong><p>Correo: '+escape(u.email)+(u.authProvider==='firebase'?'':' · Pendiente de vincular con Firebase')+'</p></article>').join('')||'<p>Aún no hay empleados.</p>';
   }
+  async function hours(){const data=await request('admin/hours');el('hoursEnabled').checked=data.hours.enabled;el('hoursDays').innerHTML=FoodHours.days.map((name,i)=>'<div class="hours-row"><strong>'+name+'</strong><label><input type="checkbox" data-day-closed="'+i+'" '+(data.hours.days[i].closed?'checked':'')+'> Cerrado</label><label>Apertura <input type="time" data-day-open="'+i+'" value="'+data.hours.days[i].open+'" required></label><label>Cierre <input type="time" data-day-close="'+i+'" value="'+data.hours.days[i].close+'" required></label></div>').join('');el('hoursPreview').textContent=FoodHours.status(data.hours).text;}
+  el('hoursForm').addEventListener('submit',async e=>{e.preventDefault();const button=e.submitter;button.disabled=true;try{const value={enabled:el('hoursEnabled').checked,days:FoodHours.days.map((_,i)=>({closed:document.querySelector('[data-day-closed="'+i+'"]').checked,open:document.querySelector('[data-day-open="'+i+'"]').value,close:document.querySelector('[data-day-close="'+i+'"]').value}))};await request('admin/hours','PUT',FoodHours.validate(value));await hours();window.dispatchEvent(new Event('restaurant-hours-changed'));message('Horarios guardados.');}catch(err){message(err.message,true);}finally{button.disabled=false;}});
   async function tab(name) {
     if(name!=='orders'&&staffUser.role!=='dueno')return;
-    for(const key of ['orders','products','employees','sales'])el('staff'+key[0].toUpperCase()+key.slice(1)).classList.toggle('hidden',key!==name);
+    for(const key of ['orders','products','employees','sales','hours'])el('staff'+key[0].toUpperCase()+key.slice(1)).classList.toggle('hidden',key!==name);
     document.querySelectorAll('[data-staff-tab]').forEach(b => { if (b.dataset.staffTab === name) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
-    try { await ({orders,products:productList,employees,sales}[name])();message(''); } catch(err){message(err.message,true);}
+    try { await ({orders,products:productList,employees,sales,hours}[name])();message(''); } catch(err){message(err.message,true);}
   }
   window.showStaffPanel=async user=>{
     staffUser=user;for(const id of ['splash','welcome','register','app'])el(id).classList.add('hidden');el('staffPanel').classList.remove('hidden');
@@ -53,7 +55,7 @@
   el('staffLogout').addEventListener('click',async()=>{try{await request('logout','POST');['tizafood_user','tizafood_orders','tizafood_cart','tizafood_favs'].forEach(k=>localStorage.removeItem(k));location.reload();}catch(err){message(err.message,true);}});
   let imageSelection = 0, imageBusy = false;
   function showProductImage(name='Imagen guardada') {
-    const image=el('productImg').value;
+    const image=FoodManagement.imagePath(el('productImg').value);if(image)el('productImg').value=image;
     if(image)el('productImagePreview').src=image;else el('productImagePreview').removeAttribute('src');
     el('productImagePreview').classList.toggle('hidden',!image);
     el('removeProductImage').classList.toggle('hidden',!image);

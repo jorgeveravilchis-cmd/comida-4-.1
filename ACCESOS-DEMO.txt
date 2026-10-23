@@ -1,17 +1,7 @@
-ACCESOS ACTUALES — FIREBASE
+ACCESO ACTUAL
 
-Cliente, dueño y empleado entran con correo y contraseña de Firebase.
-Ya no se usa Authenticator ni el acceso local para iniciar sesión.
-Se necesita internet para entrar.
-
-DUEÑO Y EMPLEADO ANTERIORES — VINCULACIÓN UNA SOLA VEZ
-En su pantalla de acceso pulsa "Pasar mi cuenta anterior a Firebase".
-Datos anteriores que permiten comprobar la vinculación:
-Dueño: dueno.demo / Dueno2026!
-Empleado: empleado.demo / Empleado2026!
-
-Elige tu correo y contraseña de Firebase dentro de ese formulario.
-Después entra siempre con ese correo y contraseña.
-No hay correos ni contraseñas nuevos asignados automáticamente.
-
-Consulta GUIA-FIREBASE.md para instrucciones completas.
+Firebase Authentication con correo y contraseña para los tres roles.
+Cliente: verifica su correo mediante un enlace al registrarse; después entra con correo y contraseña.
+Dueño y empleado: cuenta Firebase autorizada para su rol.
+No se utiliza SMS, Authenticator ni QR. Se necesita internet.
+Plan Spark gratuito, sujeto a los límites de Firebase. Consulta GUIA-FIREBASE.md.

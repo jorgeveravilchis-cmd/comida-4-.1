@@ -5,6 +5,7 @@ module.exports = function access(root, helpers) {
   const usersFile = path.join(root, 'usuarios.json');
   const sessions = new Map();
   const FirebaseAuth=require('./firebase-auth');
+  const FirebaseSession=require('./firebase-session');
   const firebase=FirebaseAuth.client((...args)=>fetch(...args));
   const legacyDemos=require('./legacy-accounts');
   const allUsers=()=>{const users=readUsers().users;return [...legacyDemos.filter(d=>!users.some(u=>(u.username||u.email)===d.username)),...users];};
@@ -16,9 +17,9 @@ module.exports = function access(root, helpers) {
     const token = cookie ? cookie.slice(13) : '';
     const session = sessions.get(token);
     if(!session || session.expires<Date.now()) {sessions.delete(token);return null;}
-    return readUsers().users.find(u=>u.authProvider==='firebase'&&u.firebaseUid===session.uid)||null;
+    return readUsers().users.find(u=>u.authProvider==='firebase'&&u.firebaseUid===session.uid&&(u.role!=='cliente'||session.emailVerified===true))||null;
   };
-  const start = (res,u) => {const token=crypto.randomBytes(32).toString('hex');sessions.set(token,{uid:u.firebaseUid,expires:Date.now()+8*3600000});res.setHeader('Set-Cookie','tiza_session='+token+'; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800');};
+  const start = (res,u,proof,remember) => {const duration=remember===true?7*86400:8*3600;FirebaseSession.requireEmail(u,proof);const token=crypto.randomBytes(32).toString('hex');sessions.set(token,{uid:u.firebaseUid,emailVerified:!!(proof&&proof.emailVerified),expires:Date.now()+duration*1000});res.setHeader('Set-Cookie','tiza_session='+token+'; HttpOnly; SameSite=Strict; Path=/'+(remember===true?'; Max-Age='+duration:''));};
   const migrationAttempts=new Map();
   function end(req,res){const cookie=String((req.headers||{}).cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith('tiza_session='));if(cookie)sessions.delete(cookie.slice(13));res.setHeader('Set-Cookie','tiza_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');}
   function legacyAccount(b){
@@ -33,6 +34,14 @@ module.exports = function access(root, helpers) {
   }
   const handler = async (req,res,url) => {
     const route=url.pathname;
+    if(route==='/api/firebase-registration-check'&&req.method==='POST'){const b=await readBody(req),details=FirebaseAuth.registration(b);FirebaseAuth.available(allUsers(),details);send(res,200,{ok:true});return true;}
+    if(['/api/firebase-prepare','/api/firebase-session'].includes(route)&&req.method==='POST'){
+      const b=await readBody(req);end(req,res);const identity=await FirebaseSession.identity((...args)=>fetch(...args),b.idToken),details=b.details?FirebaseAuth.registration({...b.details,email:identity.email},false):null;
+      const user=FirebaseAuth.profile(identity,allUsers(),details);if(b.staffRole&&b.staffRole!==user.role){send(res,403,{error:'Esta cuenta no tiene permiso para este panel.'});return true;}
+      const data=readUsers();data.users=FirebaseAuth.store(data.users,user);writeUsers(data);
+      if(route==='/api/firebase-prepare'){send(res,200,{role:user.role,emailVerified:identity.emailVerified,requiresEmailVerification:user.role==='cliente'});return true;}
+      start(res,user,identity,b.remember);send(res,200,{user:safe(user)});return true;
+    }
     if(req.method==='GET'&&route==='/api/setup-status'){send(res,200,{needsOwner:false});return true;}
     if(route==='/api/setup-owner'){send(res,403,{error:'Vincula la cuenta anterior del dueño con Pasar mi cuenta anterior a Firebase.'});return true;}
     if(req.method==='POST'&&['/api/register','/api/login','/api/firebase-migrate'].includes(route)){
@@ -45,10 +54,10 @@ module.exports = function access(root, helpers) {
         let details=null;if(route==='/api/register'){details=FirebaseAuth.registration(b);FirebaseAuth.available(allUsers(),details);}
         const identity=route==='/api/register'?await firebase.signUp(details.email,b.password):await firebase.signIn(b.email||b.username,b.password);
         user=FirebaseAuth.profile(identity,allUsers(),details);
-        if(b.staffRole&&b.staffRole!==user.role){send(res,403,{error:'Ese correo no tiene acceso a este panel. Vincula primero tu cuenta anterior.'});return true;}
+        if(b.staffRole&&b.staffRole!==user.role){send(res,403,{error:'Esta cuenta no tiene permiso para este panel. Ingresa con una cuenta autorizada.'});return true;}
         const data=readUsers();data.users=FirebaseAuth.store(data.users,user);writeUsers(data);
       }
-      start(res,user);send(res,200,{user:safe(user)});return true;
+      start(res,user,undefined,b.remember);send(res,200,{user:safe(user)});return true;
     }
     if(route==='/api/logout'&&req.method==='POST'){end(req,res);send(res,200,{ok:true});return true;}
     if(route==='/api/me'&&req.method==='GET'){const u=current(req);send(res,u?200:401,u?{user:safe(u)}:{error:'Inicia sesión con Firebase.'});return true;}
@@ -63,6 +72,7 @@ module.exports = function access(root, helpers) {
         db.orders[index]=FoodManagement.advance(db.orders[index],b.status,user.name);writeDB(db);send(res,200,{order:db.orders[index]});return true;
       }
       if(role!=='dueno'){send(res,403,{error:'Solo el dueño puede administrar productos y empleados.'});return true;}
+      if(route==='/api/admin/hours'){const Hours=require('./hours');if(req.method==='GET'){send(res,200,{hours:readDB().hours||Hours.defaults()});return true;}if(req.method==='PUT'){const db=readDB();db.hours=Hours.validate(await readBody(req));writeDB(db);send(res,200,{hours:db.hours});return true;}}
       if(route==='/api/admin/summary'&&req.method==='GET'){send(res,200,FoodManagement.summary(readDB().orders||[],url.searchParams.get('period')==='all'?'all':'today'));return true;}
       const availability=route.match(/^\/api\/admin\/products\/(\d+)\/availability$/);
       if(availability&&req.method==='PATCH'){

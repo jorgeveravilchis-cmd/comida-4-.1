@@ -19,15 +19,15 @@
   const emailOf=v=>String(v||'').trim().toLowerCase();
   const validEmail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)&&v.length<=120;
   function credentials(email,password){email=emailOf(email);if(!validEmail(email))throw Error('Para Firebase escribe tu correo electrónico, no el usuario local.');if(typeof password!=='string'||password.length<8||password.length>256)throw Error('Escribe una contraseña de 8 a 256 caracteres.');return{email,password};}
-  function registration(b){
-    const c=credentials(b.email,b.password),name=String(b.name||'').trim(),username=String(b.username||'').trim().toLowerCase();
+  function registration(b,requirePassword=true){
+    const c=requirePassword?credentials(b.email,b.password):{email:emailOf(b.email)};if(!validEmail(c.email))throw Error('Escribe un correo válido.');const name=String(b.name||'').trim(),username=String(b.username||'').trim().toLowerCase();
     if(name.length<2||name.length>100||!/^[a-z0-9@._+-]{3,120}$/.test(username))throw Error('Escribe nombre y un usuario válido de al menos 3 caracteres.');
     const parts={};for(const k of ['street','houseNumber','neighborhood','municipality','state','postalCode']){parts[k]=String((b.addressParts||{})[k]||'').trim();if(!parts[k]||parts[k].length>100)throw Error('Completa todos los campos de dirección.');}
     if(!/^\d{5}$/.test(parts.postalCode))throw Error('El código postal debe tener 5 dígitos.');
     return{name,username,email:c.email,addressParts:parts,address:`${parts.street} ${parts.houseNumber}, ${parts.neighborhood}, ${parts.municipality}, ${parts.state}, C.P. ${parts.postalCode}`};
   }
   function staffRegistration(b){const c=credentials(b.email||b.username,b.password),name=String(b.name||'').trim();if(name.length<2||name.length>100)throw Error('Escribe el nombre completo del empleado.');return{name,username:c.email,email:c.email,address:'',addressParts:null};}
-  function available(users,profile,exceptUid){if(users.some(u=>!(exceptUid&&u.authProvider==='firebase'&&u.firebaseUid===exceptUid)&&[u.username,u.email].some(v=>v&&[profile.username,profile.email].includes(v))))throw Error('Ese usuario o correo ya tiene una cuenta en esta aplicación. Si es una cuenta anterior, usa Pasar mi cuenta anterior a Firebase.');}
+  function available(users,profile,exceptUid){if(users.some(u=>!(exceptUid&&u.authProvider==='firebase'&&u.firebaseUid===exceptUid)&&[u.username,u.email].some(v=>v&&[profile.username,profile.email].includes(v))))throw Error('Ese usuario o correo ya tiene una cuenta en esta aplicación. Si ya tienes cuenta, inicia sesión con tu correo y contraseña.');}
   function profile(identity,users,details,assignedRole){
     if(!identity||typeof identity.localId!=='string'||!identity.localId||identity.localId.length>128||!validEmail(emailOf(identity.email)))throw Error('Firebase devolvió una identidad incompleta. Vuelve a iniciar sesión.');
     const existing=users.find(u=>u.authProvider==='firebase'&&u.firebaseUid===identity.localId);

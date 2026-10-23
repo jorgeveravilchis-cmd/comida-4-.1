@@ -1,0 +1,16 @@
+/* Postali: se envía únicamente el código postal; la dirección completa no se comparte. */
+(() => {
+  const el=id=>document.getElementById(id),cp=el('rPostalCode'),colony=el('rNeighborhood'),select=el('postalNeighborhood'),municipality=el('rMunicipality'),state=el('rState'),status=el('postalStatus');
+  let timer,controller,sequence=0,automatic=null;
+  function cancel(){clearTimeout(timer);sequence++;if(controller)controller.abort();controller=null;}
+  function manual(clear=false){select.classList.add('hidden');colony.classList.remove('hidden');municipality.readOnly=false;state.readOnly=false;if(clear&&automatic){if(municipality.value===automatic.municipality)municipality.value='';if(state.value===automatic.state)state.value='';if(automatic.colonies.includes(colony.value))colony.value='';}automatic=null;select.replaceChildren();}
+  function text(value){return typeof value==='string'&&value.trim().length>0&&value.trim().length<=100?value.trim():null;}
+  async function lookup(code,id){controller=new AbortController();const currentController=controller,timeout=setTimeout(()=>currentController.abort(),8000);status.textContent='Consultando código postal en Postali…';
+    try{const response=await fetch('https://postali.app/api/v1/mx/cp/'+encodeURIComponent(code),{signal:currentController.signal,credentials:'omit',referrerPolicy:'no-referrer'});if(!response.ok)throw Error('lookup');const data=await response.json();const region=text(data.estado),city=text(data.municipio),colonies=[...new Set((Array.isArray(data.asentamientos)?data.asentamientos:[]).map(a=>text(a.nombre)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));if(data.cp!==code||!region||!city||!colonies.length)throw Error('data');if(id!==sequence||cp.value!==code)return;
+      automatic={municipality:city,state:region,colonies};municipality.value=city;state.value=region;municipality.readOnly=true;state.readOnly=true;select.replaceChildren();const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='Elige tu colonia';select.append(placeholder);for(const name of colonies){const option=document.createElement('option');option.value=name;option.textContent=name;select.append(option);}select.value=colonies.length===1?colonies[0]:'';colony.value=select.value;colony.classList.add('hidden');select.classList.remove('hidden');status.textContent=colonies.length===1?'Estado, municipio y colonia completados con Postali.':'Estado y municipio completados. Elige tu colonia.';
+    }catch(e){if(id!==sequence)return;manual();status.textContent='No se pudo consultar este código postal. Puedes completar municipio, estado y colonia manualmente.';}finally{clearTimeout(timeout);if(controller===currentController)controller=null;}
+  }
+  cp.addEventListener('input',()=>{cancel();cp.value=cp.value.replace(/\D/g,'').slice(0,5);manual(true);status.textContent='';if(/^\d{5}$/.test(cp.value)){const code=cp.value,id=sequence;timer=setTimeout(()=>lookup(code,id),450);}});
+  select.addEventListener('change',()=>{colony.value=select.value;});
+  el('postalManual').addEventListener('click',()=>{cancel();manual();status.textContent='Captura manual activada. Puedes corregir los datos de tu dirección.';colony.focus();});
+})();

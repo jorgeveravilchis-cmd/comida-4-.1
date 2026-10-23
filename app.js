@@ -24,10 +24,10 @@ const PRODUCTS = [
   { id: 5,  name: "Papas Grandes",       cat: "Snacks",       price: 35, img: "img/papas.jpg",
     desc: "Papas doradas y crujientes con sal. Perfectas para compartir.", rating: 4.8,
     reviews: [{ user: "jimin p.", stars: "⭐⭐⭐⭐⭐", comment: "Súper crujientes y calientitas." }] },
-  { id: 6,  name: "Nuggets (10 pzas)",   cat: "Snacks",       price: 55, img: "img/nuggets.jpg",
+  { id: 6,  name: "Nuggets (10 pzas)",   cat: "Snacks",       price: 55, img: "img/Nuggets.jpg",
     desc: "Diez nuggets de pollo con dos salsas a elegir: BBQ o mostaza miel.", rating: 5.0,
     reviews: [{ user: "Taehyung k.", stars: "⭐⭐⭐⭐⭐", comment: "Igual a la imagen, recomiendo 10/10." }] },
-  { id: 7,  name: "Alitas (8 pzas)",     cat: "Snacks",       price: 89, img: "img/alitas.jpg",
+  { id: 7,  name: "Alitas (8 pzas)",     cat: "Snacks",       price: 89, img: "img/Alitas.jpg",
     desc: "Ocho alitas bañadas en salsa BBQ o búfalo, con aderezo ranch.", rating: 4.5,
     reviews: [{ user: "jungkook j.", stars: "⭐⭐⭐⭐⭐", comment: "Tienen un sabor bueno pero pueden mejorar." }] },
   { id: 15, name: "Aros de Cebolla",     cat: "Snacks",       price: 42, img: "img/aros.jpg",
@@ -118,7 +118,7 @@ const PRODUCTS = [
     desc: "Seis dedos de queso mozzarella empanizados con salsa marinara.", rating: 4.6, reviews: [] },
   { id: 44, name: "Pizza 4 Quesos", cat: "Pizzas", price: 85, img: "img/pizza-4quesos.jpg", more: true,
     desc: "Mozzarella, cheddar, parmesano y queso crema sobre masa artesanal.", rating: 4.7, reviews: [] },
-  { id: 45, name: "Pizza Familiar", cat: "Pizzas", price: 150, img: "img/pizza-familiar.jpg", more: true,
+  { id: 45, name: "Pizza Familiar", cat: "Pizzas", price: 150, img: "img/famili.jpg", more: true,
     desc: "Pizza grande de 8 rebanadas, elige tu especialidad.", rating: 4.8, reviews: [] },
   { name: "Combo Kids",           cat: "Combos",       price: 69,  img: "img/combo-kids.jpg", tag: "bestseller", tagText: "KIDS",
     short: "6 nuggets + papas + jugo", desc: "Seis nuggets de pollo, papas chicas y jugo. Incluye sorpresa." }
@@ -172,7 +172,7 @@ const PROMOS = [
     short: "6 nuggets + papas + jugo", desc: "Seis nuggets de pollo, papas chicas y jugo. Incluye sorpresa." },
   { name: "2x1 en Hot Dogs",      cat: "Snacks",       price: 59,  img: "img/hotdog.jpg",  tag: "save", tagText: "2x1",
     short: "Dos hot dogs jumbo", desc: "Dos hot dogs jumbo con tocino, cebolla, jitomate y aderezos al gusto." },
-  { name: "Martes de Alitas",     cat: "Snacks",       price: 75,  img: "img/alitas.jpg", tag: "popular", tagText: "-15%",
+  { name: "Martes de Alitas",     cat: "Snacks",       price: 75,  img: "img/Alitas.jpg", tag: "popular", tagText: "-15%",
     short: "8 alitas BBQ o búfalo", desc: "Ocho alitas bañadas en la salsa que elijas, con aderezo ranch." },
   { name: "Combo Taquero",        cat: "Combos",       price: 99,  img: "img/tacos.jpg", tag: "bestseller", tagText: "NUEVO",
     short: "5 tacos al pastor + 2 refrescos", desc: "Cinco tacos al pastor con piña y salsa verde, más dos refrescos." },
@@ -248,7 +248,7 @@ const mapRouteUrl = (b, d) => "https://maps.google.com/maps?saddr=" + enc(branch
 const mapRouteLink = (b, d) => "https://www.google.com/maps/dir/?api=1&origin=" + enc(branchQuery(b)) + "&destination=" + enc(destQuery(d));
 
 function mediaHTML(p) {
-  return '<img src="' + esc(p.img) + '" alt="' + esc(p.name) + '" loading="lazy" ' +
+  return '<img src="' + esc(FoodManagement.imagePath(p.img)) + '" alt="' + esc(p.name) + '" loading="lazy" ' +
          "onerror=\"this.outerHTML='<span class=&quot;emoji&quot;>" + p.emoji + "</span>'\">";
 }
 
@@ -281,6 +281,7 @@ function applyDB(db) {
   if (!db || typeof db !== "object") return;
   const put = (arr, src) => { if (Array.isArray(src)) arr.splice(0, arr.length, ...src); };
   if (db.transfer && typeof db.transfer === "object") transferConfig = { bank: String(db.transfer.bank || "").trim(), holder: String(db.transfer.holder || "").trim(), clabe: String(db.transfer.clabe || "").trim(), demo: db.transfer.demo === true };
+  for(const item of [...(db.products||[]),...(db.promos||[])])item.img=FoodManagement.imagePath(item.img);
   put(PRODUCTS, db.products);
   put(PROMOS, db.promos);
   put(BRANCHES, db.branches);
@@ -439,7 +440,7 @@ async function showApp() {
       state.user = result.user;
       if (state.user.role !== "cliente") { window.showStaffPanel(state.user); return; }
       const orders = await fetch("api/orders", {cache:"no-store"});
-      if (orders.ok) { state.orders = (await orders.json()).orders; save("tizafood_orders",state.orders); }
+      if (orders.ok) { state.orders = (await orders.json()).orders; FoodNotifications.observe(state.user.email,state.orders); save("tizafood_orders",state.orders); }
     } catch (err) {
       state.user = null; save("tizafood_user",null);
       $("#register").classList.remove("hidden"); $("#welcome").classList.add("hidden"); $("#app").classList.add("hidden"); return;
@@ -491,23 +492,24 @@ $$("[data-password-toggle]").forEach(button=>button.addEventListener("click",()=
 ["registerForm","employeeForm"].forEach(id=>document.getElementById(id).addEventListener("reset",()=>{
   document.querySelectorAll('#'+id+' [data-password-toggle]').forEach(button=>hidePassword(button.dataset.passwordToggle));
 }));
-let authLogin=true,ownerSetup=false,staffLoginRole='',migrationRole='';
+let authLogin=true,ownerSetup=false,staffLoginRole='';
 function renderAuthMode(){
   ownerSetup=false;
   const creating=!authLogin;
   $("#confirmPasswordField").classList.toggle("hidden",!creating);$("#rPasswordConfirm").disabled=!creating;$("#rPasswordConfirm").value='';hidePassword('rPassword');hidePassword('rPasswordConfirm');
+  $("#btnForgotPassword").classList.toggle("hidden",creating);
   $("#register").classList.toggle('staff-login',!!staffLoginRole);$("#registrationDetails").classList.toggle('hidden',!creating);$("#registrationContact").classList.toggle('hidden',!creating);
   $("#register h2").textContent=staffLoginRole?(staffLoginRole==='dueno'?'Acceso del dueño':'Acceso del empleado'):(authLogin?'Iniciar sesión':'Crear cuenta de cliente');
-  $("#register .muted").textContent=authLogin?'Entra con tu correo y contraseña de Firebase. Si tenías una cuenta anterior, pulsa Pasar mi cuenta anterior a Firebase.':'Completa tus datos para recibir pedidos. Tu acceso se creará en Firebase.';
-  $("label[for=rUsername]").textContent=authLogin?'Correo de Firebase':'Usuario';$("#rUsername").type=authLogin?'email':'text';$("#rUsername").placeholder=authLogin?'correo@ejemplo.com':'Tu usuario';
-  $("#rPassword").autocomplete=authLogin?'current-password':'new-password';$("#btnAuthMode").textContent=authLogin?'Crear cuenta de cliente':'Ya tengo cuenta: iniciar sesión';$("#registerError").textContent='';$("#btnOwnerSetup").classList.add('hidden');
+  $("#register .muted").textContent=authLogin?'Ingresa con tu correo electrónico y contraseña.':'Completa tus datos para crear tu cuenta y recibir pedidos.';
+  $("label[for=rUsername]").textContent=authLogin?'Correo electrónico':'Usuario';$("#rUsername").type=authLogin?'email':'text';$("#rUsername").placeholder=authLogin?'correo@ejemplo.com':'Tu usuario';
+  $("#rPassword").autocomplete=authLogin?'current-password':'new-password';$("#btnAuthMode").textContent=authLogin?'Crear cuenta de cliente':'Ya tengo cuenta: iniciar sesión';$("#registerError").textContent='';$("#registerStatus").textContent='';$("#btnOwnerSetup").classList.add('hidden');
 }
 $("#btnAuthMode").addEventListener('click',()=>{staffLoginRole='';authLogin=!authLogin;renderAuthMode();});renderAuthMode();
 $$("[data-staff-login]").forEach(button=>button.addEventListener('click',()=>{staffLoginRole=button.dataset.staffLogin;authLogin=true;$("#welcome").classList.add('hidden');$("#register").classList.remove('hidden');$("#rUsername").value='';$("#rPassword").value='';renderAuthMode();$("#rUsername").focus();}));
 $("#registerForm").addEventListener('submit',async e=>{
-  e.preventDefault();const error=$("#registerError");error.textContent='';
-  const body={username:$("#rUsername").value.trim(),password:$("#rPassword").value,authProvider:'firebase'};if(staffLoginRole)body.staffRole=staffLoginRole;
-  if(authLogin&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.username)){error.textContent='Escribe tu correo de Firebase. Para una cuenta anterior, usa Pasar mi cuenta anterior a Firebase.';return;}
+  e.preventDefault();const error=$("#registerError");error.textContent='';$("#registerStatus").textContent='';
+  const body={username:$("#rUsername").value.trim(),password:$("#rPassword").value,authProvider:'firebase',remember:$('#rememberSession').checked};if(staffLoginRole)body.staffRole=staffLoginRole;
+  if(authLogin&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.username)){error.textContent='Escribe un correo electrónico válido.';return;}
   if(!body.username||body.password.length<8){error.textContent='Completa tus datos y escribe una contraseña de al menos 8 caracteres.';return;}
   if(!authLogin){
     if(body.password!==$("#rPasswordConfirm").value){error.textContent='Las contraseñas no coinciden. Vuelve a escribirlas.';return;}
@@ -516,19 +518,10 @@ $("#registerForm").addEventListener('submit',async e=>{
     if(Object.values(body.addressParts).some(v=>!v)||!/^\d{5}$/.test(body.addressParts.postalCode)){error.textContent='Completa la dirección y escribe un código postal de 5 dígitos.';return;}
   }
   await dbReady;const button=$("#registerForm button[type=submit]");button.disabled=true;
-  try{const response=await fetch('api/'+(authLogin?'login':'register'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),result=await response.json();if(!response.ok)throw Error(result.error);if(!result.user)throw Error('Recarga la app con Ctrl + F5 para cargar el acceso de Firebase.');await finishAuth(result.user);}catch(err){error.textContent=err.message;}finally{button.disabled=false;}
+  try{let result;if(staffLoginRole){const response=await fetch('api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});result=await response.json();if(!response.ok)throw Error(result.error);}else result=await FoodEmail.authenticate(body,{register:!authLogin});
+    if(result.requiresNewLogin){authLogin=true;renderAuthMode();$("#rUsername").value=body.email||body.username;$("#registerStatus").textContent=result.message;toast(result.message);return;}if(!result.user)throw Error('No se pudo verificar tu acceso.');await finishAuth(result.user);
+  }catch(err){error.textContent=err.message;}finally{button.disabled=false;}
 });
-$("#btnMigrateAccount").addEventListener('click',()=>{migrationRole=staffLoginRole;$("#firebaseMigrationForm").reset();$("#migrationError").textContent='';$("#migrationConfirmField").classList.remove('hidden');$("#migrationPasswordConfirm").disabled=false;$("#migrationLegacyUsername").value=staffLoginRole?(staffLoginRole==='dueno'?'dueno.demo':'empleado.demo'):$("#rUsername").value;openModal('#firebaseMigrationModal');});
-$("#migrationMode").addEventListener('change',()=>{const creating=$("#migrationMode").value==='create';$("#migrationConfirmField").classList.toggle('hidden',!creating);$("#migrationPasswordConfirm").disabled=!creating;$("#migrationPasswordConfirm").value='';});
-$("#firebaseMigrationForm").addEventListener('submit',async e=>{
-  e.preventDefault();if(window.firebaseMigrationBusy)return;const error=$("#migrationError");error.textContent='';const creating=$("#migrationMode").value==='create';
-  const body={legacyUsername:$("#migrationLegacyUsername").value.trim(),legacyPassword:$("#migrationLegacyPassword").value,email:$("#migrationEmail").value.trim(),password:$("#migrationPassword").value,createAccount:creating};if(migrationRole)body.staffRole=migrationRole;
-  if(!body.legacyUsername||body.legacyPassword.length<8||body.password.length<8||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)){error.textContent='Completa el usuario y contraseña anteriores, un correo válido y la contraseña de Firebase de al menos 8 caracteres.';return;}
-  if(creating&&body.password!==$("#migrationPasswordConfirm").value){error.textContent='Las contraseñas de Firebase no coinciden.';return;}
-  window.firebaseMigrationBusy=true;$("#migrationSubmit").disabled=true;
-  try{const response=await fetch('api/firebase-migrate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),result=await response.json();if(!response.ok)throw Error(result.error);closeModal($("#firebaseMigrationModal"));await finishAuth(result.user);toast('Cuenta vinculada. A partir de ahora entra con tu correo y contraseña de Firebase.');}catch(err){error.textContent=err.message;}finally{window.firebaseMigrationBusy=false;$("#migrationSubmit").disabled=false;}
-});
-
 let clientSyncTimer = null, clientSyncBusy = false;
 async function syncClientData() {
   if (clientSyncBusy || dbSource !== "api" || !state.user || state.user.role !== "cliente") return;
@@ -540,6 +533,7 @@ async function syncClientData() {
     if(!state.user || state.user.email !== email)return;
     const changed = JSON.stringify(PRODUCTS)!==JSON.stringify(db.products);
     applyDB(db);
+    FoodNotifications.observe(email,orderData.orders);
     state.orders=orderData.orders.map(order=>{const old=state.orders.find(o=>o.folio===order.folio);return old?Object.assign(old,order):order;});
     save("tizafood_orders",state.orders);
     if(changed){renderCats();renderMenu();renderFavs();if(state.view==="search")renderSearch();}
@@ -590,20 +584,19 @@ function openModal(id) {
 function closeModal(m) {
   m.classList.remove("open");
   m.setAttribute("aria-hidden", "true");
-  if(m.id==='firebaseMigrationModal'){$('#firebaseMigrationForm').reset();['migrationLegacyPassword','migrationPassword','migrationPasswordConfirm'].forEach(hidePassword);}
 }
 
 $$(".modal").forEach((m) => {
   m.addEventListener("click", (e) => {
+    if(m.id==="emailVerificationModal")return;
     if (m.id === "payModal" && pay.busy) return;
-    if(m.id==="firebaseMigrationModal"&&window.firebaseMigrationBusy)return;
     if (e.target === m || e.target.closest("[data-close]")) closeModal(m);
   });
 });
 $$(".screen [data-back]").forEach((b) => b.addEventListener("click", () => closeScreen(b.closest(".screen"))));
 
 document.addEventListener("keydown", (e) => {
-  if (e.key !== "Escape" || pay.busy || window.firebaseMigrationBusy) return;
+  if (e.key !== "Escape" || pay.busy) return;
   const modals = $$(".modal.open");
   if (modals.length) { modals.forEach(closeModal); return; }
   const screens = $$(".screen.open");
@@ -784,7 +777,7 @@ function crearTarjetaPromo(p, esClon) {
 
   card.innerHTML =
     '<span class="card-tag ' + p.tag + '">' + esc(p.tagText) + "</span>" +
-    '<img src="' + esc(p.img) + '" alt="' + esc(p.name) + '" class="card-img" draggable="false">' +
+    '<img src="' + esc(FoodManagement.imagePath(p.img)) + '" alt="' + esc(p.name) + '" class="card-img" draggable="false">' +
     "<h3>" + esc(p.name) + "</h3>" +
     '<p class="card-desc">' + esc(p.short) + "</p>" +
     '<div class="card-bottom"><span class="card-price">' + money(p.price) + "</span>" +
@@ -984,8 +977,8 @@ async function startCheckout(items, fromCart) {
   await syncClientData();
   try { FoodManagement.available(items, {products:PRODUCTS,promos:PROMOS}); } catch(err) { toast(err.message); return; }
   // dest = lugar de entrega de ESTE pedido (por defecto tu dirección; se puede cambiar aquí mismo)
-  state.checkout = { items, fromCart, couponCode:"", dest: { text: state.user.address, coords: null } };
-  $("#couponInput").value="";$("#couponMessage").textContent="";
+  state.checkout = { items, fromCart, deliveryNotes:"", couponCode:"", dest: { text: state.user.address, coords: null } };
+  $("#deliveryNotes").value="";$("#couponInput").value="";$("#couponMessage").textContent="";
   $("#addrMsg").textContent = "También puedes tocar el mapa para marcar el punto exacto.";
   $("#coAddrInput").value = state.user.address;
   renderCheckout();
@@ -1223,15 +1216,7 @@ $("#btnGeo").addEventListener("click", () => {
   }, { enableHighAccuracy: true, timeout: 10000 });
 });
 
-$("#btnFinalize").addEventListener("click", () => {
-  const co = state.checkout;
-  if (!co || $("#btnFinalize").disabled) return;
-  const b = BRANCHES[state.branch];
-  $("#cfBranch").textContent = b.name;
-  $("#cfAddress").textContent = co.dest.text;
-  $("#cfEta").textContent = etaText(b);
-  $("#cfTotal").textContent = money(checkoutPricing().total);
-  openModal("#confirmModal");
+$("#btnFinalize").addEventListener("click",()=>{if(!state.checkout||$("#btnFinalize").disabled)return;state.checkout.deliveryNotes=$("#deliveryNotes").value.trim();openPay();
 });
 
 // "Sí, confirmar" -> ahora primero se pide la tarjeta
@@ -1350,7 +1335,7 @@ function updatePaymentMethod() {
   $("#payForm .demo-note").classList.toggle("hidden", method !== "Tarjeta");
   $("#paymentNotice").classList.toggle("hidden", !method || method === "Tarjeta");
   $("#paymentNotice").textContent = method === "Efectivo" ? "Paga en efectivo al recibir tu pedido." : "Solicita los datos bancarios a la sucursal. El pago quedará pendiente hasta que la sucursal verifique la transferencia.";
-  $("#btnPay").textContent = method === "Tarjeta" ? "Pagar " + $("#payTotal").textContent : "Confirmar pedido";
+  $("#btnPay").textContent = "Revisar pedido";
 }
 $$("[data-payment]").forEach(button => button.addEventListener("click", () => {
   if (pay.busy) return;
@@ -1364,7 +1349,7 @@ function openPay() {
   ["#ccNumber", "#ccExp", "#ccCvv"].forEach((s) => { $(s).value = ""; });
   $("#payError").textContent = "";
   $("#payTotal").textContent = money(total);
-  $("#btnPay").textContent = "Pagar " + money(total);
+  $("#btnPay").textContent = "Revisar pedido";
   $("#ccCard").classList.remove("flip", "shake");
   $("#payOverlay").className = "pay-overlay";
   paintCard();
@@ -1380,6 +1365,7 @@ function openPay() {
 $("#payForm").addEventListener("submit", (e) => {
   e.preventDefault();
   if (pay.busy) return;
+  const opening=FoodHours.status(restaurantHours);if(!opening.open){$("#payError").textContent=opening.text;renderRestaurantHours();return;}
   const method = $("#paymentMethod").value;
   if (!["Tarjeta", "Efectivo", "Transferencia"].includes(method)) return;
   if (method !== "Tarjeta") {
@@ -1399,7 +1385,7 @@ $("#payForm").addEventListener("submit", (e) => {
       payment.demo = transferConfig.demo === true;
     }
     closeModal($("#payModal"));
-    completeOrder(payment);
+    showOrderReview(payment);
     return;
   }
   const err = cardError();
@@ -1417,17 +1403,7 @@ $("#payForm").addEventListener("submit", (e) => {
   const payment = { method: "Tarjeta", brand: cardBrand(d), last4: d.slice(-4) };
   ["#ccNumber", "#ccExp", "#ccCvv"].forEach((s) => { $(s).value = ""; });
 
-  pay.busy = true;
-  const ov = $("#payOverlay");
-  ov.className = "pay-overlay show processing";
-  setTimeout(() => { ov.className = "pay-overlay show success"; Sound.play("pay"); }, 1900);
-  setTimeout(() => {
-    pay.busy = false;
-    closeModal($("#payModal"));
-    ov.className = "pay-overlay";
-    paintCard();
-    completeOrder(payment);
-  }, 3600);
+  closeModal($("#payModal"));showOrderReview(payment);
 });
 
 async function completeOrder(payment) {
@@ -1451,6 +1427,7 @@ async function completeOrder(payment) {
     etaMin: etaOf(b),
     address: co.dest.text,
     coords: co.dest.coords,
+    deliveryNotes: co.deliveryNotes||"",
     payment: payment, status: "Recibido", managed: true
   };
 
@@ -1674,7 +1651,7 @@ function showTicket(o) {
     (o.payment && o.payment.method === "Transferencia" && o.payment.reference ? '<div class="t-row"><span>Referencia</span><span style="overflow-wrap:anywhere;min-width:0;text-align:right">' + esc(o.payment.reference) + '</span></div>' : "") +
     (o.payment && o.payment.method === "Efectivo" && Number.isFinite(o.payment.cashAmount) && Number.isFinite(o.payment.change) ? '<div class="t-row"><span>Paga con</span><span>' + money(o.payment.cashAmount) + '</span></div><div class="t-row"><span>Cambio</span><span>' + money(o.payment.change) + '</span></div>' : "") +
     "<hr>" +
-    '<p class="center">Entrega en:<br>' + esc(o.address) + "</p>" +
+    '<p class="center">Entrega en:<br>' + esc(o.address) + "</p>" + (o.deliveryNotes?'<p>Instrucciones: '+esc(o.deliveryNotes)+'</p>':'') +
     '<p class="t-thanks">' + (o.cancelled || o.status === "Cancelado" ? "Pedido cancelado · cargo del 20% aplicado" : "¡Gracias por tu compra!") + "</p>";
   openModal("#ticketModal");
 }
@@ -2043,3 +2020,16 @@ $("#placesList").addEventListener("click", (e) => {
 /* ---------- ARRANCAR ---------- */
 
 window.addEventListener("load", () => setTimeout(startApp, 2800));
+
+// Estado actualizado del restaurante; la API vuelve a comprobarlo al recibir el pedido.
+let restaurantHours=null;function renderRestaurantHours(){const status=FoodHours.status(restaurantHours);const target=document.getElementById('restaurantStatus');target.textContent=status.text;target.classList.toggle('closed',!status.open);}
+async function refreshRestaurantHours(){try{const r=await fetch('api/db',{cache:'no-store'});if(r.ok){const db=await r.json();restaurantHours=db.hours||null;renderRestaurantHours();}}catch(e){/* La API comprueba el horario al confirmar. */}}
+dbReady.then(refreshRestaurantHours);setInterval(refreshRestaurantHours,30000);window.addEventListener('focus',refreshRestaurantHours);window.addEventListener('restaurant-hours-changed',refreshRestaurantHours);
+
+let reviewedPayment=null;function showOrderReview(payment){if(!state.checkout)return;reviewedPayment=payment;const co=state.checkout,totals=checkoutPricing();$("#orderReviewItems").innerHTML=co.items.map((item,i)=>'<div class="review-item"><strong>'+esc(item.name)+'</strong><small>'+esc((item.extras||[]).map(e=>e.name).join(', '))+'</small><label>Cantidad <input type="number" min="1" max="20" value="'+item.qty+'" data-review-qty="'+i+'"></label></div>').join('');$("#orderReviewTotals").innerHTML=summaryHTML(co.items,totals.fee,totals.discount,totals.couponCode);$("#orderReviewAddress").textContent=co.dest.text;$("#orderReviewNotes").textContent=co.deliveryNotes?'Instrucciones: '+co.deliveryNotes:'Sin instrucciones adicionales.';$("#orderReviewPayment").textContent=payment.method+(payment.method==='Efectivo'?' · pagas con '+money(payment.cashAmount):payment.method==='Tarjeta'?' · terminación '+payment.last4:payment.reference?' · referencia '+payment.reference:'');$("#orderReviewError").textContent='';$("#reviewConfirm").textContent='Confirmar pedido · '+money(totals.total);openModal('#orderReviewModal');}
+$("#orderReviewItems").addEventListener('change',e=>{if(!e.target.matches('[data-review-qty]')||!state.checkout)return;const qty=Number(e.target.value),i=Number(e.target.dataset.reviewQty);if(!Number.isInteger(qty)||qty<1||qty>20){e.target.value=state.checkout.items[i].qty;$("#orderReviewError").textContent='La cantidad debe ser de 1 a 20.';return;}const old=state.checkout.items[i];if(old.qty===qty)return;state.checkout.items[i]={...old,qty};try{checkoutPricing();renderCheckout();showOrderReview(reviewedPayment);}catch(err){state.checkout.items[i]=old;e.target.value=old.qty;$("#orderReviewError").textContent=err.message;}});
+$("#reviewEditAddress").addEventListener('click',()=>{closeModal($("#orderReviewModal"));renderCheckout();$("#btnChangeAddr").click();});
+$("#reviewEditPayment").addEventListener('click',()=>{closeModal($("#orderReviewModal"));openPay();});
+$("#deliveryNotes").addEventListener('input',e=>{if(state.checkout)state.checkout.deliveryNotes=e.target.value.trim();});
+$("#reviewConfirm").addEventListener('click',async()=>{if(pay.busy||!state.checkout||!reviewedPayment)return;const button=$("#reviewConfirm");button.disabled=true;try{const status=FoodHours.status(restaurantHours);if(!status.open)throw Error(status.text);FoodManagement.available(state.checkout.items,{products:PRODUCTS,promos:PROMOS});if(reviewedPayment.method==='Efectivo'){const result=cashPayment(String(reviewedPayment.cashAmount),checkoutPricing().total);if(result.error)throw Error(result.error+' Cambia el pago para corregir el importe.');Object.assign(reviewedPayment,result);}closeModal($("#orderReviewModal"));await completeOrder({...reviewedPayment});}catch(err){$("#orderReviewError").textContent=err.message;}finally{button.disabled=false;}});
+
